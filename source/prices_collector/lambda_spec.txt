@@ -1,0 +1,1 @@
+lambda_prices_collector:0.0.1=src,__init__.py
