@@ -11,7 +11,7 @@ from src.service import fetch_product_price
 logging.getLogger().setLevel(logging.INFO)
 
 
-def lambda_handler(event, context):
+def handler(event, context):
     """Contains main logic for handling fetching the product price"""
 
     price = fetch_product_price()
