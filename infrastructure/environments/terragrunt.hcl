@@ -28,6 +28,7 @@ locals {
   lambda_prices_collector_image_uri = local.env_vars.lambda_prices_collector_image_uri
   products_url = local.env_vars.products_url
   products_timeout = local.env_vars.products_timeout
+  lambda_prices_collector_schedule = local.env_vars.lambda_prices_collector_schedule
 }
 
 remote_state {
@@ -53,8 +54,10 @@ inputs = {
   env = "${local.env}"
   app_name = "${local.app_name}"
   lambda_prices_collector_image_uri = "${local.lambda_prices_collector_image_uri}"
+  lambda_prices_collector_schedule = "${local.lambda_prices_collector_schedule}"
   products_url = "${local.products_url}"
   products_timeout = "${local.products_timeout}"
+
   resource_tags = {
     Application = "${local.app_name}",
     Environment = "${local.env}",
