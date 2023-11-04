@@ -36,3 +36,12 @@ module "lambda_prices_collector" {
 
   resource_tags = var.resource_tags
 }
+
+module "lambda_prices_collector_trigger" {
+  source = "../../../../../_modules/lambda_trigger"
+
+  schedule = var.lambda_prices_collector_schedule
+  lambda_arn = module.lambda_prices_collector.lambda_arn
+  lambda_name = module.lambda_prices_collector.lambda_name
+
+}
