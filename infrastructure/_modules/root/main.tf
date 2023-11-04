@@ -58,6 +58,7 @@ module "lambda_prices_collector" {
     PRODUCTS_TIMEOUT = var.products_timeout
     PRODUCTS_TABLE_NAME = module.dynamo_db_products_table.table_name
     PRODUCT_PRICES_TABLE_NAME = module.dynamo_db_product_prices_table.table_name
+    PRODUCT_HEADER_REFERER = "https://www.migros.com.tr/koska-tahin-300-g-cam-kavanoz-p-6c1be1"
   }
 
   resource_tags = var.resource_tags
