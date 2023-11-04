@@ -5,6 +5,7 @@ import os
 
 import requests
 
+from datetime import date
 from src.service_exception import ServiceError
 
 logging.getLogger().setLevel(logging.INFO)
@@ -76,12 +77,15 @@ def _extract_product_price(response):
         raise ServiceError(f"Invalid response structure. Original response: `{json_response}`")
 
     try:
-        price = {
+        product_price = {
+            "id": int(json_response["data"]["storeProductInfoDTO"]["id"]),
+            "name": json_response["data"]["storeProductInfoDTO"]["name"],
             "regularPrice": json_response["data"]["storeProductInfoDTO"]["regularPrice"],
             "salePrice": json_response["data"]["storeProductInfoDTO"]["salePrice"],
             "loyaltyPrice": json_response["data"]["storeProductInfoDTO"]["loyaltyPrice"],
-            "shownPrice": json_response["data"]["storeProductInfoDTO"]["shownPrice"]
+            "shownPrice": json_response["data"]["storeProductInfoDTO"]["shownPrice"],
+            "date": date.today()
         }
-        return price
+        return product_price
     except Exception:
         raise ServiceError(f"Error on extracting the product price. Original response: `{json_response}`")
