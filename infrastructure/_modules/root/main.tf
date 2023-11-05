@@ -4,7 +4,7 @@
 module "sqs_product_prices" {
   source = "../../../../../_modules/sqs"
 
-  name = "product-prices-queue-${var.region}-${var.env}"
+  name = "product-prices-${var.region}-${var.env}-queue"
   lambda_arn = module.lambda_product_prices_collector_child.lambda_arn
 
   resource_tags = var.resource_tags
@@ -68,7 +68,7 @@ module "lambda_product_prices_collector_parent" {
   image_uri = var.lambda_product_prices_collector_parent_image_uri
 
   environment_variables = {
-    PRODUCTS_JSON_STRING = data.aws_ssm_parameter.products_json_string
+    PRODUCTS_JSON_STRING = data.aws_ssm_parameter.products_json_string.value
     PRODUCTS_QUEUE_URL = module.sqs_product_prices.url
   }
 

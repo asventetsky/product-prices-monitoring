@@ -1,7 +1,7 @@
 output "url" {
-  value = aws_sqs_queue.this.url
+  value = aws_sqs_queue.queue.url
 }
 
 output "arn" {
-  value = aws_sqs_queue.this.arn
+  value = aws_sqs_queue.queue.arn
 }
