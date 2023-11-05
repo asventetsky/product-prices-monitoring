@@ -12,11 +12,11 @@ from src.repository import put_product_price
 logging.getLogger().setLevel(logging.INFO)
 
 
-def fetch_product_price():
+def fetch_product_price(path, referer):
     """Fetch and construct product price"""
 
     try:
-        response = send_request()
+        response = send_request(path, referer)
         if response:
             product_price = _construct_product_price(response)
             logging.info(f"Successfully fetched product price: {product_price}")

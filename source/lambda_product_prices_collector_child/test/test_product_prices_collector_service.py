@@ -36,7 +36,9 @@ class TestProductPricesCollectorService(unittest.TestCase):
             }
         }
 
-        actual_response = fetch_product_price()
+        path = "/product_id"
+        referer = "referer"
+        actual_response = fetch_product_price(path, referer)
 
         expected_response = {
             "id": 20000007085025,
@@ -58,7 +60,9 @@ class TestProductPricesCollectorService(unittest.TestCase):
 
         mock_send_requests.side_effect = MagicMock(side_effect=LambdaException("Error on sending request"))
 
-        actual_response = fetch_product_price()
+        path = "/product_id"
+        referer = "referer"
+        actual_response = fetch_product_price(path, referer)
 
         self.assertEqual(actual_response, None)
 

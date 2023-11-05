@@ -25,10 +25,13 @@ locals {
   app_name = local.common_vars.app_name
   env = local.parsed.env
   region = local.env_vars.region
-  lambda_prices_collector_image_uri = local.env_vars.lambda_prices_collector_image_uri
+  products_json_string = local.env_vars.products_json_string
+  lambda_product_prices_collector_schedule = local.env_vars.lambda_product_prices_collector_schedule
+  lambda_product_prices_collector_parent_image_uri = local.env_vars.lambda_product_prices_collector_parent_image_uri
+  lambda_product_prices_collector_child_image_uri = local.env_vars.lambda_product_prices_collector_child_image_uri
   products_url = local.env_vars.products_url
+  products_url_provide_timestamp = local.env_vars.products_url_provide_timestamp
   products_timeout = local.env_vars.products_timeout
-  lambda_prices_collector_schedule = local.env_vars.lambda_prices_collector_schedule
 }
 
 remote_state {
@@ -53,9 +56,12 @@ inputs = {
   region = "${local.region}"
   env = "${local.env}"
   app_name = "${local.app_name}"
-  lambda_prices_collector_image_uri = "${local.lambda_prices_collector_image_uri}"
-  lambda_prices_collector_schedule = "${local.lambda_prices_collector_schedule}"
+  products_json_string = "${local.products_json_string}"
+  lambda_product_prices_collector_schedule = "${local.lambda_product_prices_collector_schedule}"
+  lambda_product_prices_collector_parent_image_uri = "${local.lambda_product_prices_collector_parent_image_uri}"
+  lambda_product_prices_collector_child_image_uri = "${local.lambda_product_prices_collector_child_image_uri}"
   products_url = "${local.products_url}"
+  products_url_provide_timestamp = "${local.products_url_provide_timestamp}"
   products_timeout = "${local.products_timeout}"
 
   resource_tags = {
