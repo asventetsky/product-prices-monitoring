@@ -12,7 +12,7 @@ class TestProductPricesCollectorClient(unittest.TestCase):
     """Represents unit tests for client module"""
 
     @patch("src.client.requests")
-    @patch.dict(os.environ, {"PRODUCTS_URL": "https://url", "PRODUCTS_TIMEOUT": "5", "PRODUCT_HEADER_REFERER": "header/referer"})
+    @patch.dict(os.environ, {"PRODUCTS_URL": "https://url", "PRODUCTS_URL_PROVIDE_TIMESTAMP": "false", "PRODUCTS_TIMEOUT": "5"})
     def test_send_request_success_response(self, mock_requests):
         """Successfully sends request"""
 
@@ -36,7 +36,9 @@ class TestProductPricesCollectorClient(unittest.TestCase):
         # specify the return value of the get() method
         mock_requests.get.return_value = mock_response
 
-        actual_response = send_request()
+        path = "/product_id"
+        referer = "referer"
+        actual_response = send_request(path, referer)
 
         expected_response = {
             "successful": "true",
@@ -55,7 +57,7 @@ class TestProductPricesCollectorClient(unittest.TestCase):
         self.assertEqual(actual_response, expected_response)
 
     @patch("src.client.requests")
-    @patch.dict(os.environ, {"PRODUCTS_URL": "https://url", "PRODUCTS_TIMEOUT": "abc", "PRODUCT_HEADER_REFERER": "header/referer"})
+    @patch.dict(os.environ, {"PRODUCTS_URL": "https://url", "PRODUCTS_URL_PROVIDE_TIMESTAMP": "false", "PRODUCTS_TIMEOUT": "abc"})
     def test_send_request_invalid_timeout_value(self, mock_requests):
         """Invalid value is provided as a timeout"""
 
@@ -79,23 +81,27 @@ class TestProductPricesCollectorClient(unittest.TestCase):
         # specify the return value of the get() method
         mock_requests.get.return_value = mock_response
 
-        actual_response = send_request()
+        path = "/product_id"
+        referer = "referer"
+        actual_response = send_request(path, referer)
 
         self.assertEqual(actual_response, None)
 
     @patch("src.client.requests")
-    @patch.dict(os.environ, {"PRODUCTS_URL": "https://url", "PRODUCTS_TIMEOUT": "5", "PRODUCT_HEADER_REFERER": "header/referer"})
+    @patch.dict(os.environ, {"PRODUCTS_URL": "https://url", "PRODUCTS_URL_PROVIDE_TIMESTAMP": "false", "PRODUCTS_TIMEOUT": "5"})
     def test_send_request_exception(self, mock_requests):
         """Exception occurred during sending the request"""
 
         mock_requests.get.side_effect = MagicMock(side_effect=Exception("Test exception"))
 
-        actual_response = send_request()
+        path = "/product_id"
+        referer = "referer"
+        actual_response = send_request(path, referer)
 
         self.assertEqual(actual_response, None)
 
     @patch("src.client.requests")
-    @patch.dict(os.environ, {"PRODUCTS_URL": "https://url", "PRODUCTS_TIMEOUT": "5", "PRODUCT_HEADER_REFERER": "header/referer"})
+    @patch.dict(os.environ, {"PRODUCTS_URL": "https://url", "PRODUCTS_URL_PROVIDE_TIMESTAMP": "false", "PRODUCTS_TIMEOUT": "5"})
     def test_send_request_non_200_response_status_code(self, mock_requests):
         """Non-200 response received from external resource"""
 
@@ -107,12 +113,14 @@ class TestProductPricesCollectorClient(unittest.TestCase):
         # specify the return value of the get() method
         mock_requests.get.return_value = mock_response
 
-        actual_response = send_request()
+        path = "/product_id"
+        referer = "referer"
+        actual_response = send_request(path, referer)
 
         self.assertEqual(actual_response, None)
 
     @patch("src.client.requests")
-    @patch.dict(os.environ, {"PRODUCTS_URL": "https://url", "PRODUCTS_TIMEOUT": "5", "PRODUCT_HEADER_REFERER": "header/referer"})
+    @patch.dict(os.environ, {"PRODUCTS_URL": "https://url", "PRODUCTS_URL_PROVIDE_TIMESTAMP": "false", "PRODUCTS_TIMEOUT": "5"})
     def test_send_request_invalid_response_structure(self, mock_requests):
         """Invalid response structure receive"""
 
@@ -126,7 +134,9 @@ class TestProductPricesCollectorClient(unittest.TestCase):
         # specify the return value of the get() method
         mock_requests.get.return_value = mock_response
 
-        actual_response = send_request()
+        path = "/product_id"
+        referer = "referer"
+        actual_response = send_request(path, referer)
 
         self.assertEqual(actual_response, None)
 
