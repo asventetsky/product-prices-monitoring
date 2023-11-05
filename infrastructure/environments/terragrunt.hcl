@@ -25,7 +25,6 @@ locals {
   app_name = local.common_vars.app_name
   env = local.parsed.env
   region = local.env_vars.region
-  products_json_string = local.env_vars.products_json_string
   lambda_product_prices_collector_schedule = local.env_vars.lambda_product_prices_collector_schedule
   lambda_product_prices_collector_parent_image_uri = local.env_vars.lambda_product_prices_collector_parent_image_uri
   lambda_product_prices_collector_child_image_uri = local.env_vars.lambda_product_prices_collector_child_image_uri
@@ -56,7 +55,6 @@ inputs = {
   region = "${local.region}"
   env = "${local.env}"
   app_name = "${local.app_name}"
-  products_json_string = "${local.products_json_string}"
   lambda_product_prices_collector_schedule = "${local.lambda_product_prices_collector_schedule}"
   lambda_product_prices_collector_parent_image_uri = "${local.lambda_product_prices_collector_parent_image_uri}"
   lambda_product_prices_collector_child_image_uri = "${local.lambda_product_prices_collector_child_image_uri}"

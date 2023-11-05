@@ -1,6 +1,5 @@
 region: "eu-north-1"
-products_json_string: '[{"path":"/7085025","referer":"https://www.migros.com.tr/koska-tahin-300-g-cam-kavanoz-p-6c1be1"},{"path":"/10350036","referer":"https://www.migros.com.tr/pinar-labne-400-g-p-9dedd4"},{"path":"/8040938","referer":"https://www.migros.com.tr/akmina-c-vitaminli-limon-aromali-maden-suyu-6x200-ml-p-7ab1ea"}]'
-lambda_product_prices_collector_schedule: "cron(20 13 * * ? *)"
+lambda_product_prices_collector_schedule: "cron(50 13 * * ? *)"
 lambda_product_prices_collector_parent_image_uri: "831386328003.dkr.ecr.eu-north-1.amazonaws.com/lambda_product_prices_collector_parent:0.0.2-snapshot"
 lambda_product_prices_collector_child_image_uri: "831386328003.dkr.ecr.eu-north-1.amazonaws.com/lambda_product_prices_collector_child:0.0.20-snapshot"
 products_url: "https://demo9244675.mockable.io/rest/products/screens"

@@ -68,20 +68,24 @@ module "lambda_product_prices_collector_parent" {
   image_uri = var.lambda_product_prices_collector_parent_image_uri
 
   environment_variables = {
-    PRODUCTS_JSON_STRING = var.products_json_string
+    PRODUCTS_JSON_STRING = data.aws_ssm_parameter.products_json_string
     PRODUCTS_QUEUE_URL = module.sqs_product_prices.url
   }
 
   resource_tags = var.resource_tags
 }
 
-module "lambda_product_prices_collector_child_trigger" {
+module "lambda_product_prices_collector_parent_trigger" {
   source = "../../../../../_modules/lambda_trigger"
 
   schedule = var.lambda_product_prices_collector_schedule
   lambda_arn = module.lambda_product_prices_collector_parent.lambda_arn
   lambda_name = module.lambda_product_prices_collector_parent.lambda_name
 
+}
+
+data "aws_ssm_parameter" "products_json_string" {
+  name = "/${var.env}/products_json_string"
 }
 
 #==============================================================#
