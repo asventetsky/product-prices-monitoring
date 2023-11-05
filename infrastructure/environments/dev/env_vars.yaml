@@ -1,5 +1,5 @@
 region: "eu-north-1"
-lambda_product_prices_collector_schedule: "cron(20 14 * * ? *)"
+lambda_product_prices_collector_schedule: "cron(30 12 * * ? *)"
 lambda_product_prices_collector_parent_image_uri: "831386328003.dkr.ecr.eu-north-1.amazonaws.com/lambda_product_prices_collector_parent:0.0.2-snapshot"
 lambda_product_prices_collector_child_image_uri: "831386328003.dkr.ecr.eu-north-1.amazonaws.com/lambda_product_prices_collector_child:0.0.20-snapshot"
 products_url: "https://demo9244675.mockable.io/rest/products/screens"

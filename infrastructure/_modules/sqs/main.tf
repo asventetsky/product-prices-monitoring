@@ -14,6 +14,11 @@ resource "aws_sqs_queue" "queue" {
 
 resource "aws_sqs_queue" "queue_deadletter" {
   name = "${var.name}-deadletter"
+}
+
+resource "aws_sqs_queue_redrive_allow_policy" "example" {
+  queue_url = aws_sqs_queue.queue_deadletter.id
+
   redrive_allow_policy = jsonencode({
     redrivePermission = "byQueue",
     sourceQueueArns   = [aws_sqs_queue.queue.arn]
