@@ -23,6 +23,7 @@ def handler(event, context):
 
 def parse_request(event):
     try:
+        # TODO: handle all records
         body_string = event["Records"][0]["body"].replace("'", '"')
         body = json.loads(body_string)
         return {
