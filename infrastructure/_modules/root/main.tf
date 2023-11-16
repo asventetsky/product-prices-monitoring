@@ -27,6 +27,7 @@ module "dynamo_db_product_prices_table" {
 
   table_name = "product_prices"
   partition_key = "product_id"
+  range_key = "date"
 
   resource_tags = var.resource_tags
 }
