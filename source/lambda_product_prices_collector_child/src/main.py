@@ -16,15 +16,15 @@ logging.getLogger().setLevel(logging.INFO)
 def handler(event, context):
     """Contains main logic for handling product price fetching"""
 
-    request = parse_request(event)
-    product_price = fetch_product_price(request["path"], request["referer"])
-    if product_price:
-        store_product_price(product_price)
+    for record in event["Records"]:
+        request = parse_request(record)
+        product_price = fetch_product_price(request["path"], request["referer"])
+        if product_price:
+            store_product_price(product_price)
 
-def parse_request(event):
+def parse_request(record):
     try:
-        # TODO: handle all records
-        body_string = event["Records"][0]["body"].replace("'", '"')
+        body_string = record["Sns"]["Message"].replace("'", '"')
         body = json.loads(body_string)
         return {
             "path": body["path"],

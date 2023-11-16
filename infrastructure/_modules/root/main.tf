@@ -1,10 +1,11 @@
 #=========================================================#
-# SQS for tasks exchange between parent and child lambdas #
+# SNS for tasks exchange between parent and child lambdas #
 #=========================================================#
-module "sqs_product_prices" {
-  source = "../../../../../_modules/sqs"
+module "sns_product_prices" {
+  source = "../../../../../_modules/sns"
 
-  name = "product-prices-${var.region}-${var.env}-queue"
+  name = "product-prices-${var.region}-${var.env}-topic"
+  lambda_name = module.lambda_product_prices_collector_child.lambda_name
   lambda_arn = module.lambda_product_prices_collector_child.lambda_arn
 
   resource_tags = var.resource_tags
@@ -42,8 +43,8 @@ data "aws_iam_policy_document" "lambda_product_prices_collector_parent" {
     effect = "Allow"
   }
   statement {
-    actions   = ["sqs:SendMessage"]
-    resources = [module.sqs_product_prices.arn]
+    actions   = ["sns:Publish"]
+    resources = [module.sns_product_prices.arn]
     effect = "Allow"
   }
 }
@@ -70,7 +71,7 @@ module "lambda_product_prices_collector_parent" {
 
   environment_variables = {
     PRODUCTS_JSON_STRING = data.aws_ssm_parameter.products_json_string.value
-    PRODUCTS_QUEUE_URL = module.sqs_product_prices.url
+    PRODUCTS_TOPIC_ARN = module.sns_product_prices.arn
   }
 
   resource_tags = var.resource_tags
@@ -101,11 +102,6 @@ data "aws_iam_policy_document" "product_prices_collector_child" {
   statement {
     actions   = ["dynamodb:PutItem"]
     resources = [module.dynamo_db_products_table.table_arn, module.dynamo_db_product_prices_table.table_arn]
-    effect = "Allow"
-  }
-  statement {
-    actions   = ["sqs:ReceiveMessage", "sqs:DeleteMessage", "sqs:GetQueueAttributes"]
-    resources = [module.sqs_product_prices.arn]
     effect = "Allow"
   }
 }
