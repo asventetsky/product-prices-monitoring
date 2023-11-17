@@ -10,7 +10,7 @@ import json
 
 logging.getLogger().setLevel(logging.INFO)
 
-client = boto3.client('sqs')
+client = boto3.client('sns')
 
 
 def handler(event, context):
@@ -22,9 +22,10 @@ def handler(event, context):
     logging.info(f"Prepared {len(products)} product(s) for fetching prices: {products}")
 
     for product in products:
-        client.send_message(
-            QueueUrl=os.environ["PRODUCTS_QUEUE_URL"],
-            MessageBody=str(product)
+        response = client.publish(
+            TopicArn=os.environ["PRODUCTS_TOPIC_ARN"],
+            Message=str(product)
         )
+        print(f"Product: {product['path']}, response: {response}")
 
     logging.info(f"Successfully created tasks for processing")
