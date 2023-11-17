@@ -1,37 +1,17 @@
 # Product prices monitoring app
-> < TBD >
+> Solution for tracking and visualising prices of the shop.
 
 ## Developing
 
-### Building
-
-Create docker image of the prices collector lambda:
+### Building and pushing docker image to Amazon ECR
+Within the source code of lambda (eg. `source/lambda_product_prices_collector_parent` or
+`source/lambda_product_prices_collector_child`) execute the following script:
 ```shell
-docker build --platform linux/amd64 -t lambda_prices_collector:<image_tag> .
+../../misc/build_push_lambda_image.sh <aws_account_id> <aws_region>
 ```
 
 ### Test the image locally
-Run the created image with required environment variables:
-```shell
-docker run --env PRODUCTS_URL=<url> --env PRODUCTS_TIMEOUT=10 -p 9000:8080 lambda_prices_collector:<image_tag>
-```
-
-Invoke the lambda:
-```shell
-curl "http://localhost:9000/2015-03-31/functions/function/invocations" -d '{}'
-```
-
-
-### Push the image to ECR
-```shell
-docker tag lambda_prices_collector:<image_tag> <aws_account_id>.dkr.ecr.<aws_region>.amazonaws.com/lambda_prices_collector:<image_tag>
-```
-```shell
-aws ecr get-login-password --region <aws_region> | sudo docker login --username AWS --password-stdin <aws_account_id>.dkr.ecr.<aws_region>.amazonaws.com/lambda_prices_collector
-```
-```shell
-sudo docker push <aws_account_id>.dkr.ecr.<aws_region>.amazonaws.com/lambda_prices_collector:<image_tag>
-```
+< TODO: run with `docker compose` (2 lambdas + SNS + DynamoDB) >
 
 ### Terragrunt apply
 Initialize Terragrunt:
