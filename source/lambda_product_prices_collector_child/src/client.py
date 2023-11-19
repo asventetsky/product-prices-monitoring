@@ -1,60 +1,72 @@
-import os
-
 import logging
 import requests
-import time
 
 from src.lambda_exception import LambdaException
 
 
-def send_request(path, referer):
+def send_request(request):
     try:
-        config = _fetch_config()
-        response = _execute_request(config, path, referer)
+        response = _execute_request(request)
         return _parse_json_response(response)
     except LambdaException as error:
         logging.error(error.message)
         return None
 
 
-def _fetch_config():
-    """Fetch config"""
-    config = {}
-    try:
-        config["URL"] = os.environ["PRODUCTS_URL"]
-        config["URL_PROVIDE_TIMESTAMP"] = bool(os.environ["PRODUCTS_URL_PROVIDE_TIMESTAMP"])
-        config["TIMEOUT"] = int(os.environ["PRODUCTS_TIMEOUT"])
-        return config
-    except Exception as error:
-        raise LambdaException(f"Error on fetching environment variables: {error}")
-
-
-def _execute_request(config, path, referer):
+def _execute_request(request):
     """Fetch response from remote resource"""
 
     try:
-        headers = {
-            'Content-Type': 'text',
-            'sec-ch-ua': '"Not.A/Brand";v="8", "Chromium";v="114", "Google Chrome";v="114"',
-            'X-PWA': 'true',
-            'sec-ch-ua-mobile': '?0',
-            'User-Agent': 'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/114.0.0.0 Safari/537.36',
-            'Accept': 'application/json',
-            'Referer': referer,
-            'X-FORWARDED-REST': 'true',
-            'sec-ch-ua-platform': '"Linux"'
-        }
-        url = config["URL"] + path
-        if config["URL_PROVIDE_TIMESTAMP"]:
-            query_params = f"?reid={round(time.time() * 1000)}000001"
-            url = url + query_params
+        headers = construct_headers(request["headers"])
+        url = construct_url(request["url"], request["queryParams"])
+
         return requests.get(
             url,
             headers=headers,
-            timeout=config["TIMEOUT"]
+            timeout=request["timeoutSeconds"]
         )
     except Exception as error:
         raise LambdaException(f"Error on sending request: {error}")
+
+
+def construct_headers(request_headers):
+    """Constructs headers"""
+
+    default_headers = {
+        'Content-Type': 'text',
+        'sec-ch-ua': '"Not.A/Brand";v="8", "Chromium";v="114", "Google Chrome";v="114"',
+        'X-PWA': 'true',
+        'sec-ch-ua-mobile': '?0',
+        'User-Agent': 'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/114.0.0.0 Safari/537.36',
+        'Accept': 'application/json',
+        'X-FORWARDED-REST': 'true',
+        'sec-ch-ua-platform': '"Linux"'
+    }
+    headers = { **default_headers, **request_headers}
+
+    return headers
+
+
+def construct_url(request_url, request_query_params):
+    """Constructs url with query params"""
+
+    url = request_url
+
+    if request_query_params:
+        query_params = []
+        for query_param in request_query_params:
+            if query_param["pythonExpression"]:
+                exec(query_param["pythonExpression"]["exec"])
+                query_param_value = eval(query_param["pythonExpression"]["eval"])
+            elif query_param["value"]:
+                query_param_value = query_param["value"]
+            else:
+                continue
+            query_params.append(f"{query_param['name']}={query_param_value}")
+        if query_params:
+            url = url + "?" + "&".join(query_params)
+
+    return url
 
 
 def _parse_json_response(response):

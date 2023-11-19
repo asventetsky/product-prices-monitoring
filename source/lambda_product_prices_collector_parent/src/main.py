@@ -22,10 +22,9 @@ def handler(event, context):
     logging.info(f"Prepared {len(products)} product(s) for fetching prices: {products}")
 
     for product in products:
-        response = client.publish(
+        client.publish(
             TopicArn=os.environ["PRODUCTS_TOPIC_ARN"],
             Message=str(product)
         )
-        print(f"Product: {product['path']}, response: {response}")
 
     logging.info(f"Successfully created tasks for processing")

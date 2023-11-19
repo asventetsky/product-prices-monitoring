@@ -3,6 +3,13 @@
 
 ## Developing
 
+### Run unit tests
+Within the source code of lambda (eg. `source/lambda_product_prices_collector_parent` or
+`source/lambda_product_prices_collector_child`) execute the following command:
+```shell
+python3 -m unittest discover test
+```
+
 ### Building and pushing docker image to Amazon ECR
 Within the source code of lambda (eg. `source/lambda_product_prices_collector_parent` or
 `source/lambda_product_prices_collector_child`) execute the following script:

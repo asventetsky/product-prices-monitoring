@@ -36,9 +36,23 @@ class TestProductPricesCollectorService(unittest.TestCase):
             }
         }
 
-        path = "/product_id"
-        referer = "referer"
-        actual_response = fetch_product_price(path, referer)
+        request = {
+            "url": "https://test-url.com/product-id",
+            "queryParams": [
+                {
+                    "name": "id",
+                    "pythonExpression": {
+                        "exec": "import time",
+                        "eval": "str(round(time.time() * 1000)) + \"000001\""
+                    }
+                }
+            ],
+            "headers": {
+                "Referer": "referer"
+            },
+            "timeoutSeconds": "5"
+        }
+        actual_response = fetch_product_price(request)
 
         expected_response = {
             "id": 20000007085025,
@@ -60,9 +74,23 @@ class TestProductPricesCollectorService(unittest.TestCase):
 
         mock_send_requests.side_effect = MagicMock(side_effect=LambdaException("Error on sending request"))
 
-        path = "/product_id"
-        referer = "referer"
-        actual_response = fetch_product_price(path, referer)
+        request = {
+            "url": "https://test-url.com/product-id",
+            "queryParams": [
+                {
+                    "name": "id",
+                    "pythonExpression": {
+                        "exec": "import time",
+                        "eval": "str(round(time.time() * 1000)) + \"000001\""
+                    }
+                }
+            ],
+            "headers": {
+                "Referer": "referer"
+            },
+            "timeoutSeconds": "5"
+        }
+        actual_response = fetch_product_price(request)
 
         self.assertEqual(actual_response, None)
 

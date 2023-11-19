@@ -18,7 +18,7 @@ def handler(event, context):
 
     for record in event["Records"]:
         request = parse_request(record)
-        product_price = fetch_product_price(request["path"], request["referer"])
+        product_price = fetch_product_price(request)
         if product_price:
             store_product_price(product_price)
 
@@ -27,8 +27,10 @@ def parse_request(record):
         body_string = record["Sns"]["Message"].replace("'", '"')
         body = json.loads(body_string)
         return {
-            "path": body["path"],
-            "referer": body["referer"]
+            "url": body["url"],
+            "queryParams": body["queryParams"],
+            "headers": body["headers"],
+            "timeoutSeconds": body["timeoutSeconds"]
         }
     except Exception as error:
         logging.error(f"Error on parsing request: {error}. Original message: {event}")
