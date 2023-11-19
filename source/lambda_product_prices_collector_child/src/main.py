@@ -19,9 +19,10 @@ def handler(event, context):
     for record in event["Records"]:
         logging.info(f"Record has been received: {record}")
         request = parse_request(record)
-        product_price = fetch_product_price(request)
-        if product_price:
-            store_product_price(product_price)
+        if request:
+            product_price = fetch_product_price(request)
+            if product_price:
+                store_product_price(product_price)
 
 def parse_request(record):
     try:
@@ -34,4 +35,4 @@ def parse_request(record):
             "timeoutSeconds": body["timeoutSeconds"]
         }
     except Exception as error:
-        logging.error(f"Error on parsing request: {error}. Original message: {event}")
+        logging.error(f"Error on parsing request: {error}. Original message: {record}")

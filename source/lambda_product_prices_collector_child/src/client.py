@@ -3,6 +3,8 @@ import requests
 
 from src.lambda_exception import LambdaException
 
+logging.getLogger().setLevel(logging.INFO)
+
 
 def send_request(request):
     try:
@@ -23,7 +25,7 @@ def _execute_request(request):
         return requests.get(
             url,
             headers=headers,
-            timeout=request["timeoutSeconds"]
+            timeout=int(request["timeoutSeconds"])
         )
     except Exception as error:
         raise LambdaException(f"Error on sending request: {error}")
@@ -65,6 +67,8 @@ def construct_url(request_url, request_query_params):
             query_params.append(f"{query_param['name']}={query_param_value}")
         if query_params:
             url = url + "?" + "&".join(query_params)
+
+    logging.info(f"Request url: {url}")
 
     return url
 

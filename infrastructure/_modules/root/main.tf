@@ -128,9 +128,6 @@ module "lambda_product_prices_collector_child" {
 
   environment_variables = {
     REGION = var.region
-    PRODUCTS_URL = var.products_url
-    PRODUCTS_URL_PROVIDE_TIMESTAMP = var.products_url_provide_timestamp
-    PRODUCTS_TIMEOUT = var.products_timeout
     PRODUCTS_TABLE_NAME = module.dynamo_db_products_table.table_name
     PRODUCT_PRICES_TABLE_NAME = module.dynamo_db_product_prices_table.table_name
   }

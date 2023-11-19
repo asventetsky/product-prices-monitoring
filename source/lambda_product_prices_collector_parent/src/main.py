@@ -19,10 +19,18 @@ def handler(event, context):
     products_json_string = os.environ["PRODUCTS_JSON_STRING"]
     products = json.loads(products_json_string)
 
-    logging.info(f"Prepared {len(products)} product(s) for fetching prices: {products}")
+    logging.info(f"Prepared {len(products['items'])} product(s) for fetching prices: {products}")
 
-    for product in products:
+    url = products["url"]
+    query_params = products["queryParams"]
+    timeout_seconds = products["timeoutSeconds"]
+
+    for product in products["items"]:
         # TODO: wrap with try-except in order to catch errors
+        # TODO: remove `path` field from message
+        product["url"] = url + product["path"]
+        product["queryParams"] = query_params
+        product["timeoutSeconds"] = timeout_seconds
         client.publish(
             TopicArn=os.environ["PRODUCTS_TOPIC_ARN"],
             Message=str(product)
