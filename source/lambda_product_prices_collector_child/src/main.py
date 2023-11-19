@@ -17,6 +17,7 @@ def handler(event, context):
     """Contains main logic for handling product price fetching"""
 
     for record in event["Records"]:
+        logging.info(f"Record has been received: {record}")
         request = parse_request(record)
         product_price = fetch_product_price(request)
         if product_price:
