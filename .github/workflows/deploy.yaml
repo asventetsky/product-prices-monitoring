@@ -23,9 +23,9 @@ jobs:
       - name: "📦 install dependencies"
         run: |
           echo "Installing dependencies for parent lambda"
-          cd source/lambda_product_prices_collector_parent && python3 -m pip install -r requirements.txt
+          (cd source/lambda_product_prices_collector_parent && python3 -m pip install -r requirements.txt)
           echo "Installing dependencies for child lambda"
-          cd source/lambda_product_prices_collector_child && python3 -m pip install -r requirements.txt
+          (cd source/lambda_product_prices_collector_child && python3 -m pip install -r requirements.txt)
 
       - name: "🔍 run code quality check"
         run: |
