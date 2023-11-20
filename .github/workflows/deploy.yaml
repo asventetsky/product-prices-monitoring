@@ -1,0 +1,62 @@
+name: Product prices monitoring DEPLOY
+
+on:
+  push:
+    branches:
+      - feature/initial-workflow
+#on:
+#  workflow_dispatch:
+
+jobs:
+  install-dependencies:
+    name: Install dependencies
+    runs-on: ubuntu-latest
+    steps:
+      - name: "☁️ checkout repository"
+        uses: actions/checkout@v3
+
+      - name: "🔧 install python 3.9"
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.9'
+
+      - name: "📦 install dependencies"
+        run: |
+          echo "Installing dependencies for parent lambda"
+
+  code-quality:
+    name: Code quality
+    needs: install-dependencies
+    runs-on: ubuntu-latest
+    steps:
+      - name: "🔍 run code quality check"
+        run: |
+          echo "Running code quality tools..."
+
+  test:
+    name: Test application
+    needs: code-quality
+    runs-on: ubuntu-latest
+    steps:
+      - name: "🔍 run tests"
+        run: |
+          echo "Running tests..."
+
+  build:
+    name: Build application
+    needs: test
+    runs-on: ubuntu-latest
+    steps:
+      - name: "🔍 build"
+        run: |
+          echo "Building app..."
+
+  deploy-dev:
+    name: Deploy application to DEV
+    environment: dev
+    needs: build
+    runs-on: ubuntu-latest
+    steps:
+      - name: "🔍 deploy"
+        run: |
+          echo "Deploying app to DEV..."
