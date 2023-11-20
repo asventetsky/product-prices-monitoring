@@ -1,8 +1,5 @@
-# pylint: disable=import-error
-
 """ Test module """
 
-import os
 import unittest
 from unittest.mock import MagicMock, patch
 from src.client import send_request
@@ -74,7 +71,9 @@ class TestProductPricesCollectorClient(unittest.TestCase):
     def test_send_request_exception(self, mock_requests):
         """Exception occurred during sending the request"""
 
-        mock_requests.get.side_effect = MagicMock(side_effect=Exception("Test exception"))
+        mock_requests.get.side_effect = MagicMock(
+            side_effect=Exception("Test exception")
+        )
 
         request = {
             "url": "https://test-url.com/product-id",

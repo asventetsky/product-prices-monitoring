@@ -1,5 +1,3 @@
-# pylint: disable=import-error
-
 """ Test module """
 
 from datetime import date
@@ -9,7 +7,12 @@ from unittest.mock import MagicMock, patch
 from src.lambda_exception import LambdaException
 
 with patch.dict(
-        "os.environ", {"REGION": "region", "PRODUCTS_TABLE_NAME": "products", "PRODUCT_PRICES_TABLE_NAME": "products_prices"}
+        "os.environ",
+        {
+            "REGION": "region",
+            "PRODUCTS_TABLE_NAME": "products",
+            "PRODUCT_PRICES_TABLE_NAME": "products_prices"
+        }
 ):
     from src.service import fetch_product_price
     from src.service import store_product_price
@@ -72,7 +75,9 @@ class TestProductPricesCollectorService(unittest.TestCase):
     def test_fetch_product_price_exception(self, mock_send_requests):
         """Exception on product pricing fetching"""
 
-        mock_send_requests.side_effect = MagicMock(side_effect=LambdaException("Error on sending request"))
+        mock_send_requests.side_effect = MagicMock(
+            side_effect=LambdaException("Error on sending request")
+        )
 
         request = {
             "url": "https://test-url.com/product-id",
@@ -96,7 +101,9 @@ class TestProductPricesCollectorService(unittest.TestCase):
 
     @patch("src.service.put_product")
     @patch("src.service.put_product_price")
-    def test_store_product_price_success(self, mock_put_product, mock_put_product_price):
+    def test_store_product_price_success(
+            self, mock_put_product, mock_put_product_price
+    ):
         """Exception on product pricing fetching"""
 
         mock_put_product.return_value = "OK"
@@ -122,7 +129,9 @@ class TestProductPricesCollectorService(unittest.TestCase):
     def test_store_product_price_exception(self, mock_put_product):
         """Exception on product pricing fetching"""
 
-        mock_put_product.side_effect = MagicMock(side_effect=LambdaException("Error occurred while saving product"))
+        mock_put_product.side_effect = MagicMock(
+            side_effect=LambdaException("Error occurred while saving product")
+        )
 
         product_price = {
             "id": 20000007085025,
