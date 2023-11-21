@@ -30,7 +30,10 @@ jobs:
 
       - name: "🔍 run tests"
         run: |
-          echo "Running tests..."
+          echo "Running tests against parent lambda"
+          (cd source/lambda_product_prices_collector_parent && python3 -m unittest discover test)
+          echo "Running tests against child lambda"
+          (cd source/lambda_product_prices_collector_child && python3 -m unittest discover test)
 
       - name: "🔍 build"
         run: |
