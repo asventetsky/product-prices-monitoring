@@ -19,7 +19,9 @@ def fetch_product_price(request):
         response = send_request(request)
         if response:
             product_price = _construct_product_price(response)
-            logging.info(f"Successfully fetched product price: {product_price}")
+            logging.info(
+                "Successfully fetched product price: %s", product_price
+            )
             return product_price
     except LambdaException as error:
         logging.error(error.message)
@@ -41,17 +43,21 @@ def _construct_product_price(response):
     """Construct product price from the response"""
 
     try:
+        response_product_price = response["data"]["storeProductInfoDTO"]
         product_price = {
-            "id": int(response["data"]["storeProductInfoDTO"]["id"]),
-            "name": response["data"]["storeProductInfoDTO"]["name"],
+            "id": int(response_product_price["id"]),
+            "name": response_product_price["name"],
             "price": {
-                "regularPrice": response["data"]["storeProductInfoDTO"]["regularPrice"],
-                "salePrice": response["data"]["storeProductInfoDTO"]["salePrice"],
-                "loyaltyPrice": response["data"]["storeProductInfoDTO"]["loyaltyPrice"],
-                "shownPrice": response["data"]["storeProductInfoDTO"]["shownPrice"]
+                "regularPrice": response_product_price["regularPrice"],
+                "salePrice": response_product_price["salePrice"],
+                "loyaltyPrice": response_product_price["loyaltyPrice"],
+                "shownPrice": response_product_price["shownPrice"]
             },
             "date": date.today()
         }
         return product_price
-    except Exception:
-        raise LambdaException(f"Error on extracting the product price. Original response: `{response}`")
+    except Exception as exception:
+        raise LambdaException(
+            f"Error on extracting the product price. "
+            f"Original response: `{response}`"
+        ) from exception

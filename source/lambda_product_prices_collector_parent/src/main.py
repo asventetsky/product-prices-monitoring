@@ -1,5 +1,4 @@
 # pylint: disable=unused-argument
-# pylint: disable=import-error
 
 """ Application logic """
 
@@ -10,7 +9,7 @@ import json
 
 logging.getLogger().setLevel(logging.INFO)
 
-client = boto3.client('sns')
+client = boto3.client("sns")
 
 
 def handler(event, context):
@@ -19,7 +18,11 @@ def handler(event, context):
     products_json_string = os.environ["PRODUCTS_JSON_STRING"]
     products = json.loads(products_json_string)
 
-    logging.info(f"Prepared {len(products['items'])} product(s) for fetching prices: {products}")
+    logging.info(
+        "Prepared %s product(s) for fetching prices: %s",
+        len(products["items"]),
+        products
+    )
 
     url = products["url"]
     query_params = products["queryParams"]
@@ -37,4 +40,4 @@ def handler(event, context):
         )
 
     # TODO: log number of created tasks
-    logging.info(f"Successfully created tasks for processing")
+    logging.info("Successfully created tasks for processing")

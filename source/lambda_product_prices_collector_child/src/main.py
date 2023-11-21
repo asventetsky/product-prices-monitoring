@@ -1,5 +1,5 @@
 # pylint: disable=unused-argument
-# pylint: disable=import-error
+# pylint: disable=broad-exception-caught
 
 """ Application logic """
 
@@ -17,7 +17,7 @@ def handler(event, context):
     """Contains main logic for handling product price fetching"""
 
     for record in event["Records"]:
-        logging.info(f"Record has been received: {record}")
+        logging.info("Record has been received: %s", record)
         request = parse_request(record)
         if request:
             product_price = fetch_product_price(request)
@@ -35,4 +35,6 @@ def parse_request(record):
             "timeoutSeconds": body["timeoutSeconds"]
         }
     except Exception as error:
-        logging.error(f"Error on parsing request: {error}. Original message: {record}")
+        logging.error(
+            "Error on parsing request: %s. Original message: %s", error, record
+        )

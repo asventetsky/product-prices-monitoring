@@ -1,52 +1,37 @@
 name: Product prices monitoring DEPLOY
 
 on:
-  push:
-    branches:
-      - feature/initial-workflow
-#on:
-#  workflow_dispatch:
+  workflow_dispatch:
 
 jobs:
-  install-dependencies:
-    name: Install dependencies
+  build:
+    name: Build application
     runs-on: ubuntu-latest
     steps:
       - name: "☁️ checkout repository"
         uses: actions/checkout@v3
 
-      - name: "🔧 install python 3.9"
+      - name: "🔧 install python 3.11"
         uses: actions/setup-python@v4
         with:
-          python-version: '3.9'
+          python-version: '3.11'
 
       - name: "📦 install dependencies"
         run: |
           echo "Installing dependencies for parent lambda"
+          (cd source/lambda_product_prices_collector_parent && python3 -m pip install -r requirements.txt)
+          echo "Installing dependencies for child lambda"
+          (cd source/lambda_product_prices_collector_child && python3 -m pip install -r requirements.txt)
 
-  code-quality:
-    name: Code quality
-    needs: install-dependencies
-    runs-on: ubuntu-latest
-    steps:
       - name: "🔍 run code quality check"
         run: |
           echo "Running code quality tools..."
+          (cd source && pylint lambda_product_prices_collector_parent lambda_product_prices_collector_child)
 
-  test:
-    name: Test application
-    needs: code-quality
-    runs-on: ubuntu-latest
-    steps:
       - name: "🔍 run tests"
         run: |
           echo "Running tests..."
 
-  build:
-    name: Build application
-    needs: test
-    runs-on: ubuntu-latest
-    steps:
       - name: "🔍 build"
         run: |
           echo "Building app..."

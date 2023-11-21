@@ -25,9 +25,9 @@ def put_product(product_price):
             TableName=PRODUCTS_TABLE_NAME,
             Item=item
         )
-        logging.info(f"Successfully stored product: {item}")
+        logging.info("Successfully stored product: %s", item)
     except botocore.exceptions.ClientError as error:
-        logging.error(f"Error occurred while saving product: {error}")
+        logging.error("Error occurred while saving product: %s", error)
 
 
 def put_product_price(product_price):
@@ -46,6 +46,6 @@ def put_product_price(product_price):
             TableName=PRODUCT_PRICES_TABLE_NAME,
             Item=item
         )
-        logging.info(f"Successfully stored product price: {item}")
+        logging.info("Successfully stored product price: %s", item)
     except botocore.exceptions.ClientError as error:
-        logging.error(f"Error occurred while saving product price: {error}")
+        logging.error("Error occurred while saving product price: %s", error)
