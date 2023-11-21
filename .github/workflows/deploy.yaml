@@ -5,6 +5,7 @@ on:
   push:
     branches:
       - main
+      - feature/adjust-tests-step
 
 jobs:
   build:
@@ -44,6 +45,7 @@ jobs:
 
   deploy-dev:
     name: Deploy application to DEV
+    if: ${{ github.event_name == 'workflow_dispatch' }}
     environment: dev
     needs: build
     runs-on: ubuntu-latest
