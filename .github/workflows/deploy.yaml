@@ -1,11 +1,7 @@
 name: Product prices monitoring DEPLOY
 
 on:
-  push:
-    branches:
-      - feature/refactor-github-actions-workflow
-#on:
-#  workflow_dispatch:
+  workflow_dispatch:
 
 jobs:
   build:
@@ -38,7 +34,7 @@ jobs:
 
       - name: "🔍 build"
         run: |
-          echo "Running tests..."
+          echo "Building app..."
 
   deploy-dev:
     name: Deploy application to DEV
