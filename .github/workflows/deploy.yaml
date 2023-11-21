@@ -2,6 +2,9 @@ name: Product prices monitoring DEPLOY
 
 on:
   workflow_dispatch:
+  push:
+    branches:
+      - main
 
 jobs:
   build:
