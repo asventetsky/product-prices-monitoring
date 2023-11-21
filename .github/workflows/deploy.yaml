@@ -27,9 +27,9 @@ jobs:
         run: |
           echo "Running code quality tools..."
           echo "Content of parent directory"
-          ls -la lambda_product_prices_collector_parent
+          ls -la source/lambda_product_prices_collector_parent
           echo "Content of child directory"
-          ls -la lambda_product_prices_collector_child
+          ls -la source/lambda_product_prices_collector_child
           
           (cd source && pylint lambda_product_prices_collector_parent lambda_product_prices_collector_child)
 
