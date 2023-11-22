@@ -2,6 +2,10 @@ name: Product prices monitoring DEPLOY
 
 on:
   workflow_dispatch:
+  push:
+    branches:
+      - main
+      - feature/adjust-tests-step
 
 jobs:
   build:
@@ -30,7 +34,10 @@ jobs:
 
       - name: "🔍 run tests"
         run: |
-          echo "Running tests..."
+          echo "Running tests against parent lambda"
+          (cd source/lambda_product_prices_collector_parent && python3 -m unittest)
+          echo "Running tests against child lambda"
+          (cd source/lambda_product_prices_collector_child && python3 -m unittest)
 
       - name: "🔍 build"
         run: |
@@ -38,6 +45,7 @@ jobs:
 
   deploy-dev:
     name: Deploy application to DEV
+    if: ${{ github.event_name == 'workflow_dispatch' }}
     environment: dev
     needs: build
     runs-on: ubuntu-latest
