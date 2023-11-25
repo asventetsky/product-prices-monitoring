@@ -57,13 +57,14 @@ jobs:
       - name: "🔍 build & push docker images"
         run: |
           region=$(awk -F '"' '{print $2;exit}' < infrastructure/environments/${{ env.ENVIRONMENT }}/env_vars.yaml)
-          echo "REGION=$region" >> $GITHUB_ENV
+          echo "Region=${region}"
+#          echo "REGION=$region" >> $GITHUB_ENV
           
           echo "Building parent lambda..."
-          (cd source/lambda_product_prices_collector_parent && ../../misc/build_push_lambda_image.sh ${{ env.AWS_ACCOUNT }} ${{ env.REGION }})
+          (cd source/lambda_product_prices_collector_parent && ../../misc/build_push_lambda_image.sh ${{ env.AWS_ACCOUNT }} $region)
           
           echo "Building child lambda..."
-          (cd source/lambda_product_prices_collector_child && ../../misc/build_push_lambda_image.sh ${{ env.AWS_ACCOUNT }} ${{ env.REGION }})
+          (cd source/lambda_product_prices_collector_child && ../../misc/build_push_lambda_image.sh ${{ env.AWS_ACCOUNT }} $region)
 
 #      - name: "🔧 install terraform 1.3.8"
 #        uses: hashicorp/setup-terraform@v2
