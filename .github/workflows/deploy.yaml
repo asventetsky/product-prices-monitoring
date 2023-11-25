@@ -56,7 +56,7 @@ jobs:
 
       - name: "🔍 build & push docker images"
         run: |
-          region=awk -F '"' '{print $2;exit}' < infrastructure/environments/${{ env.ENVIRONMENT }}/env_vars.yaml
+          region=$(awk -F '"' '{print $2;exit}' < infrastructure/environments/${{ env.ENVIRONMENT }}/env_vars.yaml)
           echo "REGION=$region" >> $GITHUB_ENV
           
           echo "Building parent lambda..."
