@@ -51,6 +51,9 @@ jobs:
       AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
       ENVIRONMENT: dev
     steps:
+      - name: "☁️ checkout repository"
+        uses: actions/checkout@v3
+
       - name: "🔍 build & push docker images"
         run: |
           region=awk -F '"' '{print $2;exit}' < infrastructure/environments/${{ env.ENVIRONMENT }}/env_vars.yaml
