@@ -89,15 +89,17 @@ jobs:
           echo "Prepare parent image tag"
           parent_lambda_name_and_version=$(awk -F '=' '{print $1;exit}' < source/lambda_product_prices_collector_parent/lambda_spec.txt)
           parent_image_uri="${{ env.AWS_ACCOUNT }}.dkr.ecr.${region}.amazonaws.com/${parent_lambda_name_and_version}"
-          echo "parent_image_uri${parent_image_uri}"
-          sed -i -e 's/lambda_product_prices_collector_parent_image_uri: "[^"]*"/lambda_product_prices_collector_parent_image_uri: "'"$parent_image_uri"'"/g' infrastructure/environments/${{ env.ENVIRONMENT }}/env_vars.yaml
+          parent_image_uri_esc=$(sed 's/[\/\.]/\\&/g' <<<"$parent_image_uri")
+          echo "parent_image_uri_esc=${parent_image_uri_esc}"
+          sed -i -e 's/lambda_product_prices_collector_parent_image_uri: "[^"]*"/lambda_product_prices_collector_parent_image_uri: "'"$parent_image_uri_esc"'"/g' infrastructure/environments/${{ env.ENVIRONMENT }}/env_vars.yaml
           cat infrastructure/environments/${{ env.ENVIRONMENT }}/env_vars.yaml
           
           echo "Prepare child image tag"
           child_lambda_name_and_version=$(awk -F '=' '{print $1;exit}' < source/lambda_product_prices_collector_child/lambda_spec.txt)
           child_image_uri="${{ env.AWS_ACCOUNT }}.dkr.ecr.${region}.amazonaws.com/${child_lambda_name_and_version}"
-          echo "child_image_uri{child_image_uri}"
-          sed -i -e 's/lambda_product_prices_collector_child_image_uri: "[^"]*"/lambda_product_prices_collector_child_image_uri: "'"$child_image_uri"'"/g' infrastructure/environments/${{ env.ENVIRONMENT }}/env_vars.yaml
+          child_image_uri_esc=$(sed 's/[\/\.]/\\&/g' <<<"$child_image_uri")
+          echo "child_image_uri_esc=${child_image_uri_esc}"
+          sed -i -e 's/lambda_product_prices_collector_child_image_uri: "[^"]*"/lambda_product_prices_collector_child_image_uri: "'"$child_image_uri_esc"'"/g' infrastructure/environments/${{ env.ENVIRONMENT }}/env_vars.yaml
           cat infrastructure/environments/${{ env.ENVIRONMENT }}/env_vars.yaml
 
       - name: "🔍 run terragrunt init and terragrunt apply"
