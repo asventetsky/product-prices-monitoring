@@ -60,24 +60,48 @@ jobs:
           echo "Region=${region}"
           
           echo "Building parent lambda..."
-          (cd source/lambda_product_prices_collector_parent && ../../misc/build_push_lambda_image.sh ${{ env.AWS_ACCOUNT }} $region)
+          (cd source/lambda_product_prices_collector_parent && \
+          ../../misc/build_push_lambda_image.sh ${{ env.AWS_ACCOUNT }} $region)
           
           echo "Building child lambda..."
-          (cd source/lambda_product_prices_collector_child && ../../misc/build_push_lambda_image.sh ${{ env.AWS_ACCOUNT }} $region)
+          (cd source/lambda_product_prices_collector_child && \
+          ../../misc/build_push_lambda_image.sh ${{ env.AWS_ACCOUNT }} $region)
 
-#      - name: "🔧 install terraform 1.3.8"
-#        uses: hashicorp/setup-terraform@v2
-#        with:
-#          terraform_version: 1.3.8
-#
-#      - name: "🔧 install terragrunt 0.43.2"
-#        run: |
-#          curl -LJO https://github.com/gruntwork-io/terragrunt/releases/download/v0.43.2/terragrunt_linux_amd64
-#          mv terragrunt_linux_amd64 terragrunt
-#          chmod +x terragrunt
-#          sudo mv terragrunt /usr/local/bin
-#          ls -l /usr/local/bin
-#          terragrunt --version
-#
-#      - name: "🔍 run terragrunt init and terragrunt apply"
-#        run: cd infrastructure/environments/${{ env.ENVIRONMENT }} && terragrunt init --terragrunt-non-interactive && terragrunt apply -auto-approve
+      - name: "🔧 install terraform 1.3.8"
+        uses: hashicorp/setup-terraform@v2
+        with:
+          terraform_version: 1.3.8
+
+      - name: "🔧 install terragrunt 0.43.2"
+        run: |
+          curl -LJO https://github.com/gruntwork-io/terragrunt/releases/download/v0.43.2/terragrunt_linux_amd64
+          mv terragrunt_linux_amd64 terragrunt
+          chmod +x terragrunt
+          sudo mv terragrunt /usr/local/bin
+          ls -l /usr/local/bin
+          terragrunt --version
+
+      - name: "🔍 prepare environment vars"
+        run: |
+          region=$(awk -F '"' '{print $2;exit}' < infrastructure/environments/${{ env.ENVIRONMENT }}/env_vars.yaml)
+          echo "Region=${region}"
+          
+          echo "Prepare parent image tag"
+          parent_lambda_name_and_version=$(awk -F '=' '{print $1;exit}' < source/lambda_product_prices_collector_parent/lambda_spec.txt)
+          parent_image_uri="${{ env.AWS_ACCOUNT }}.dkr.ecr.${region}.amazonaws.com/${parent_lambda_name_and_version}"
+          echo "parent_image_uri${parent_image_uri}"
+          sed -i -e 's/lambda_product_prices_collector_parent_image_uri: "[^"]*"/lambda_product_prices_collector_parent_image_uri: "'"$parent_image_uri"'"/g' infrastructure/environments/${{ env.ENVIRONMENT }}/env_vars.yaml
+          cat infrastructure/environments/${{ env.ENVIRONMENT }}/env_vars.yaml
+          
+          echo "Prepare child image tag"
+          child_lambda_name_and_version=$(awk -F '=' '{print $1;exit}' < source/lambda_product_prices_collector_child/lambda_spec.txt)
+          child_image_uri="${{ env.AWS_ACCOUNT }}.dkr.ecr.${region}.amazonaws.com/${child_lambda_name_and_version}"
+          echo "child_image_uri{child_image_uri}"
+          sed -i -e 's/lambda_product_prices_collector_child_image_uri: "[^"]*"/lambda_product_prices_collector_child_image_uri: "'"$child_image_uri"'"/g' infrastructure/environments/${{ env.ENVIRONMENT }}/env_vars.yaml
+          cat infrastructure/environments/${{ env.ENVIRONMENT }}/env_vars.yaml
+
+      - name: "🔍 run terragrunt init and terragrunt apply"
+        run: |
+          (cd infrastructure/environments/${{ env.ENVIRONMENT }} && \
+          terragrunt init --terragrunt-non-interactive && \
+          terragrunt apply -auto-approve)
