@@ -3,6 +3,7 @@
 build_and_push_images() {
   AWS_ACCOUNT=$1
   AWS_REGION=$2
+  echo "AWS_ACCOUNT=${AWS_ACCOUNT}, AWS_REGION=${AWS_REGION}"
 
   ECR_ACCOUNT="${AWS_ACCOUNT}.dkr.ecr.${AWS_REGION}.amazonaws.com"
 
