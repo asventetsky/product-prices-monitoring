@@ -6,6 +6,7 @@ on:
   push:
     branches:
       - main
+      - feature/deploy-and-increment-versions
 
 jobs:
   build:
@@ -13,7 +14,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: "☁️ checkout repository"
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
 
       - name: "🔧 install python 3.11"
         uses: actions/setup-python@v4
@@ -52,7 +53,7 @@ jobs:
       ENVIRONMENT: dev
     steps:
       - name: "☁️ checkout repository"
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
 
       - name: "🔍 build & push docker images"
         run: |
@@ -107,3 +108,25 @@ jobs:
           (cd infrastructure/environments/${{ env.ENVIRONMENT }} && \
           terragrunt init --terragrunt-non-interactive && \
           terragrunt apply -auto-approve)
+
+  post-deploy:
+    name: Post deploy actions
+    needs: [build]
+    runs-on: ubuntu-latest
+    steps:
+      - name: "☁️ checkout repository"
+        uses: actions/checkout@v4
+        run: |
+          echo "Update parent lambda version"
+          sed -ri 's/(.*)([0-9]+\.[0-9]+\.)([0-9]+)(-snapshot=)(.*)/echo "\1\2$((\3+1))\4\5"/ge' source/lambda_product_prices_collector_parent/lambda_spec.txt
+          
+          echo "Update child lambda version"
+          sed -ri 's/(.*)([0-9]+\.[0-9]+\.)([0-9]+)(-snapshot=)(.*)/echo "\1\2$((\3+1))\4\5"/ge' source/lambda_product_prices_collector_parent/lambda_spec.txt
+          
+          echo "Committing updated versions"
+          git config user.name github-actions
+          git config user.email github-actions@github.com
+          git add .
+          git status
+          git commit -m "Update parent and child lambdas versions"
+          git push
