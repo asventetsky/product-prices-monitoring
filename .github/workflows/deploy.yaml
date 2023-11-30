@@ -111,11 +111,13 @@ jobs:
 
   post-deploy:
     name: Post deploy actions
-    needs: [build]
+    needs: [build, deploy-dev]
     runs-on: ubuntu-latest
     steps:
       - name: "☁️ checkout repository"
         uses: actions/checkout@v4
+
+      - name: "☁️ increment lambdas versions"
         run: |
           echo "Update parent lambda version"
           sed -ri 's/(.*)([0-9]+\.[0-9]+\.)([0-9]+)(-snapshot=)(.*)/echo "\1\2$((\3+1))\4\5"/ge' source/lambda_product_prices_collector_parent/lambda_spec.txt
