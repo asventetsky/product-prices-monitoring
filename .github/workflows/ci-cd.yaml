@@ -1,0 +1,89 @@
+name: Product prices monitoring CD
+
+on:
+  workflow_dispatch:
+  pull_request:
+  push:
+    branches:
+      - main
+
+jobs:
+  build:
+    name: Build application
+    runs-on: ubuntu-latest
+    steps:
+      - name: "☁️ checkout repository"
+        uses: actions/checkout@v4
+
+      - name: "🔧 install python 3.11"
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.11'
+
+      - name: "📦 install dependencies"
+        run: |
+          echo "Installing dependencies for parent lambda"
+          (cd source/lambda_product_prices_collector_parent && python3 -m pip install -r requirements.txt)
+          echo "Installing dependencies for child lambda"
+          (cd source/lambda_product_prices_collector_child && python3 -m pip install -r requirements.txt)
+
+      - name: "🔍 run code quality check"
+        run: |
+          echo "Running code quality tools..."
+          (cd source && pylint lambda_product_prices_collector_parent lambda_product_prices_collector_child)
+
+      - name: "🔍 run tests"
+        run: |
+          echo "Running tests against parent lambda"
+          (cd source/lambda_product_prices_collector_parent && python3 -m unittest)
+          echo "Running tests against child lambda"
+          (cd source/lambda_product_prices_collector_child && python3 -m unittest)
+
+  deploy-dev:
+    name: Deploy application to DEV
+    if: ${{ github.event_name == 'workflow_dispatch' }}
+    needs: build
+    uses: ./.github/workflows/deploy-env.yaml
+    with:
+      environment: dev
+    secrets:
+      aws-account: ${{ secrets.AWS_ACCOUNT }}
+      aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+      aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+
+  deploy-prod:
+    name: Deploy application to PROD
+    if: ${{ github.event_name == 'workflow_dispatch' && startsWith(github.ref_name, 'release') }}
+    needs: deploy-dev
+    uses: ./.github/workflows/deploy-env.yaml
+    with:
+      environment: prod
+    secrets:
+      aws-account: ${{ secrets.AWS_ACCOUNT }}
+      aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+      aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+
+  post-deploy:
+    name: Post deploy actions
+    needs: [build, deploy-dev, deploy-prod]
+    if: ${{ github.event_name == 'workflow_dispatch' && !failure() && !cancelled() }}
+    runs-on: ubuntu-latest
+    steps:
+      - name: "☁️ checkout repository"
+        uses: actions/checkout@v4
+
+      - name: "☁️ increment lambdas versions"
+        run: |
+          echo "Update parent lambda version"
+          sed -ri 's/(.*)([0-9]+\.[0-9]+\.)([0-9]+)(-snapshot=)(.*)/echo "\1\2$((\3+1))\4\5"/ge' source/lambda_product_prices_collector_parent/lambda_spec.txt
+          
+          echo "Update child lambda version"
+          sed -ri 's/(.*)([0-9]+\.[0-9]+\.)([0-9]+)(-snapshot=)(.*)/echo "\1\2$((\3+1))\4\5"/ge' source/lambda_product_prices_collector_child/lambda_spec.txt
+          
+          echo "Committing updated versions"
+          git config user.name github-actions
+          git config user.email github-actions@github.com
+          git add .
+          git status
+          git commit -m "Update parent and child lambdas versions"
+          git push
