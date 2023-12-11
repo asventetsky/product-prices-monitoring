@@ -43,7 +43,7 @@ jobs:
     name: Deploy application to DEV
     if: ${{ github.event_name == 'workflow_dispatch' }}
     needs: build
-    uses: ./.github/workflows/deploy-env.yaml
+    uses: ./.github/workflows/deploy.yaml
     with:
       environment: dev
     secrets:
@@ -55,7 +55,7 @@ jobs:
     name: Deploy application to PROD
     if: ${{ github.event_name == 'workflow_dispatch' && startsWith(github.ref_name, 'release') }}
     needs: deploy-dev
-    uses: ./.github/workflows/deploy-env.yaml
+    uses: ./.github/workflows/deploy.yaml
     with:
       environment: prod
     secrets:
