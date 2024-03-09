@@ -5,7 +5,7 @@ prepare_terragrunt_variables() {
   ENVIRONMENT=$2
   VAR_TO_UPDATE=$3
 
-  PATH_TO_ENV_VARS="infrastructure/environments/${ENVIRONMENT}/env_vars.yaml"
+  PATH_TO_ENV_VARS="./../../../../infrastructure/environments/${ENVIRONMENT}/env_vars.yaml"
 
   LAMBDA_NAME_AND_VERSION=$(./../../../../misc/extract_lambda_name_version.sh)
   REGION=$(awk -F '"' '{print $2;exit}' < $PATH_TO_ENV_VARS)
