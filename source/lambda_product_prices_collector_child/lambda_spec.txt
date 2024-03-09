@@ -1,1 +1,0 @@
-lambda_product_prices_collector_child:0.0.31-snapshot=src,__init__.py

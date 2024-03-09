@@ -1,18 +1,22 @@
 #!/bin/bash
 
-build_and_push_images() {
+push_image() {
   AWS_ACCOUNT=$1
   AWS_REGION=$2
   echo "AWS_ACCOUNT=${AWS_ACCOUNT}, AWS_REGION=${AWS_REGION}"
 
   ECR_ACCOUNT="${AWS_ACCOUNT}.dkr.ecr.${AWS_REGION}.amazonaws.com"
 
-  LAMBDA_SPEC=($(cat lambda_spec.txt | tr "=" " "))
-  LAMBDA_NAME_AND_VERSION=${LAMBDA_SPEC[0]}
-  echo "LAMBDA_NAME_AND_VERSION=${LAMBDA_NAME_AND_VERSION}"
+  FILE_NAME="lambda_spec.txt"
 
-  echo "Building the image ${LAMBDA_NAME_AND_VERSION}"
-  sudo docker build -t "${LAMBDA_NAME_AND_VERSION}" .
+  # Parse the values using awk
+  NAME=$(awk -F= '/^name=/ {print $2}' "$FILE_NAME")
+  VERSION=$(awk -F= '/^version=/ {print $2}' "$FILE_NAME")
+  LAMBDA_NAME_AND_VERSION="${NAME}:${VERSION}"
+
+  echo "Loading the image ${LAMBDA_NAME_AND_VERSION}"
+  docker load --input ../target/"${LAMBDA_NAME_AND_VERSION}".tar
+
   echo "Tagging the image ${LAMBDA_NAME_AND_VERSION} with ${ECR_ACCOUNT}/${LAMBDA_NAME_AND_VERSION}"
   sudo docker tag "${LAMBDA_NAME_AND_VERSION}" "${ECR_ACCOUNT}/${LAMBDA_NAME_AND_VERSION}"
 
@@ -23,7 +27,7 @@ build_and_push_images() {
 }
 
 main() {
-  build_and_push_images $1 $2
+  push_image $1 $2 $3
 }
 
 main "$@"; exit
