@@ -7,7 +7,7 @@ push_image() {
 
   ECR_ACCOUNT="${AWS_ACCOUNT}.dkr.ecr.${AWS_REGION}.amazonaws.com"
 
-  FILE_NAME='lambda_spec.txt'
+  FILE_NAME="{$3}lambda_spec.txt"
 
   # Parse the values using awk
   NAME=$(awk -F= '/^name=/ {print $2}' "$FILE_NAME")
@@ -27,7 +27,7 @@ push_image() {
 }
 
 main() {
-  push_image $1 $2
+  push_image $1 $2 $3
 }
 
 main "$@"; exit
