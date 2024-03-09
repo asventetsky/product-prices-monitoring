@@ -21,7 +21,7 @@ build() {
   python3 -m pip install -r requirements.txt
 
   echo "Running code quality tools"
-  pylint --rcfile=../.pylintrc ${DIRECTORY}
+  pylint --rcfile=../.pylintrc
 
   echo "Running tests"
   python3 -m unittest
