@@ -2,7 +2,7 @@
 
 build_image() {
   DIRECTORY=$1
-  FILE_NAME="{$DIRECTORY}lambda_spec.txt"
+  FILE_NAME="{$DIRECTORY}/lambda_spec.txt"
 
   # Parse the values using awk
   NAME=$(awk -F= '/^name=/ {print $2}' "$FILE_NAME")
@@ -18,14 +18,16 @@ build_image() {
 }
 
 build() {
+  DIRECTORY=$1
+
   echo "Installing dependencies"
-  (cd ${{ inputs.directory }} && python3 -m pip install -r requirements.txt)
+  (cd ${DIRECTORY} && python3 -m pip install -r requirements.txt)
 
   echo "Running code quality tools"
-  pylint ${{ inputs.directory }}
+  pylint ${DIRECTORY}
 
   echo "Running tests"
-  (cd ${{ inputs.directory }} && python3 -m unittest)
+  (cd ${DIRECTORY} && python3 -m unittest)
 
   build_image $1
 }
