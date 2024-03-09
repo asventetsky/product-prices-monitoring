@@ -1,2 +1,2 @@
 name=lambda_product_prices_collector_parent
-version=0.0.13-snapshot
+version=0.0.14-snapshot
