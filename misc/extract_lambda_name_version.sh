@@ -1,6 +1,6 @@
 #!/bin/bash
 
-fetch_lambda_name_version() {
+extract_lambda_name_version() {
   FILE_NAME='lambda_spec.txt'
 
   # Parse the values using awk
@@ -12,7 +12,7 @@ fetch_lambda_name_version() {
 }
 
 main() {
-  echo $(fetch_lambda_name_version)
+  echo $(extract_lambda_name_version)
 }
 
 main "$@"; exit
