@@ -3,16 +3,9 @@
 push_image() {
   AWS_ACCOUNT=$1
   AWS_REGION=$2
-  echo "AWS_ACCOUNT=${AWS_ACCOUNT}, AWS_REGION=${AWS_REGION}"
 
   ECR_ACCOUNT="${AWS_ACCOUNT}.dkr.ecr.${AWS_REGION}.amazonaws.com"
-
-  FILE_NAME="lambda_spec.txt"
-
-  # Parse the values using awk
-  NAME=$(awk -F= '/^name=/ {print $2}' "$FILE_NAME")
-  VERSION=$(awk -F= '/^version=/ {print $2}' "$FILE_NAME")
-  LAMBDA_NAME_AND_VERSION="${NAME}:${VERSION}"
+  LAMBDA_NAME_AND_VERSION=$(./../../../../misc/extract_lambda_name_version.sh)
 
   echo "Loading the image ${LAMBDA_NAME_AND_VERSION}"
   docker load --input ../target/"${LAMBDA_NAME_AND_VERSION}".tar

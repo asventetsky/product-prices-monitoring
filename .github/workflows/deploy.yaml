@@ -6,7 +6,7 @@ on:
   push:
     branches:
       - main
-      - feature/refactor-lambdas
+      - feature/refactor-deployment
 
 jobs:
   build:
@@ -90,31 +90,12 @@ jobs:
           terragrunt --version
 
       - name: "🔍 prepare environment vars"
-        run: |
-          region=$(awk -F '"' '{print $2;exit}' < infrastructure/environments/${{ env.ENVIRONMENT }}/env_vars.yaml)
-          echo "Region=${region}"
-
-          echo "Prepare parent image tag"
-          FILE_NAME='source/backend/product_prices_collector/parent/lambda_spec.txt'
-          NAME=$(awk -F= '/^name=/ {print $2}' "$FILE_NAME")
-          VERSION=$(awk -F= '/^version=/ {print $2}' "$FILE_NAME")
-          parent_lambda_name_and_version="${NAME}:${VERSION}"
-          parent_image_uri="${{ env.AWS_ACCOUNT }}.dkr.ecr.${region}.amazonaws.com/${parent_lambda_name_and_version}"
-          parent_image_uri_esc=$(sed 's/[\/\.]/\\&/g' <<<"$parent_image_uri")
-          echo "parent_image_uri_esc=${parent_image_uri_esc}"
-          sed -i -e 's/lambda_product_prices_collector_parent_image_uri: "[^"]*"/lambda_product_prices_collector_parent_image_uri: "'"$parent_image_uri_esc"'"/g' infrastructure/environments/${{ env.ENVIRONMENT }}/env_vars.yaml
-          cat infrastructure/environments/${{ env.ENVIRONMENT }}/env_vars.yaml
-
-          echo "Prepare child image tag"
-          FILE_NAME='source/backend/product_prices_collector/child/lambda_spec.txt'
-          NAME=$(awk -F= '/^name=/ {print $2}' "$FILE_NAME")
-          VERSION=$(awk -F= '/^version=/ {print $2}' "$FILE_NAME")
-          child_lambda_name_and_version="${NAME}:${VERSION}"
-          child_image_uri="${{ env.AWS_ACCOUNT }}.dkr.ecr.${region}.amazonaws.com/${child_lambda_name_and_version}"
-          child_image_uri_esc=$(sed 's/[\/\.]/\\&/g' <<<"$child_image_uri")
-          echo "child_image_uri_esc=${child_image_uri_esc}"
-          sed -i -e 's/lambda_product_prices_collector_child_image_uri: "[^"]*"/lambda_product_prices_collector_child_image_uri: "'"$child_image_uri_esc"'"/g' infrastructure/environments/${{ env.ENVIRONMENT }}/env_vars.yaml
-          cat infrastructure/environments/${{ env.ENVIRONMENT }}/env_vars.yaml
+        run: |    
+          (cd source/backend/product_prices_collector/parent && \
+          ../../../../misc/prepare_terragrunt_variables.sh ${{ env.AWS_ACCOUNT }} ${{ env.ENVIRONMENT }} lambda_product_prices_collector_parent_image_uri)
+          
+          (cd source/backend/product_prices_collector/child && \
+          ../../../../misc/prepare_terragrunt_variables.sh ${{ env.AWS_ACCOUNT }} ${{ env.ENVIRONMENT }} lambda_product_prices_collector_child_image_uri)
 
       - name: "🔍 run terragrunt init and terragrunt apply"
         run: |

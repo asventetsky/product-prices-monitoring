@@ -1,12 +1,7 @@
 #!/bin/bash
 
 build_image() {
-  FILE_NAME='lambda_spec.txt'
-
-  # Parse the values using awk
-  NAME=$(awk -F= '/^name=/ {print $2}' "$FILE_NAME")
-  VERSION=$(awk -F= '/^version=/ {print $2}' "$FILE_NAME")
-  LAMBDA_NAME_AND_VERSION="${NAME}:${VERSION}"
+  LAMBDA_NAME_AND_VERSION=$(./../../../../misc/extract_lambda_name_version.sh)
 
   echo "Building the image ${LAMBDA_NAME_AND_VERSION}"
   docker build -t "${LAMBDA_NAME_AND_VERSION}" .
@@ -28,8 +23,6 @@ build() {
 
   build_image
 }
-
-
 
 main() {
   build $1
