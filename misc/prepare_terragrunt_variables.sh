@@ -1,6 +1,6 @@
 #!/bin/bash
 
-prepare_variables() {
+prepare_terragrunt_variables() {
   AWS_ACCOUNT=$1
   ENVIRONMENT=$2
   VAR_TO_UPDATE=$3
@@ -17,7 +17,7 @@ prepare_variables() {
 }
 
 main() {
-  prepare_variables
+  prepare_terragrunt_variables
 }
 
 main "$@"; exit
