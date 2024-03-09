@@ -23,17 +23,19 @@ jobs:
 
       - name: "🔍 build product-prices-collector-parent docker image"
         run: |
-          ./misc/build.sh source/backend/product_prices_collector/parent
+          (cd source/backend/product_prices_collector/parent && \
+          ../../../../misc/build.sh)
 
       - name: "🔍 build product-prices-collector-child docker image"
         run: |
-          ./misc/build.sh source/backend/product_prices_collector/child
+          (cd source/backend/product_prices_collector/child && \
+          ../../../../misc/build.sh)
 
       - name: "💾 save product prices collector lambda docker images"
         uses: actions/cache@v3
         with:
           key: product-prices-collector-artifacts-${{ github.run_number }}
-          path: ./target
+          path: ./source/backend/product_prices_collector/target
 
   deploy-dev:
     name: Deploy application to DEV
@@ -54,7 +56,7 @@ jobs:
         uses: actions/cache@v3
         with:
           key: product-prices-collector-artifacts-${{ github.run_number }}
-          path: ./target
+          path: ./source/backend/product_prices_collector/target
           fail-on-cache-miss: true
 
       - name: "🔍 push product-prices-collector-parent docker image to ECR"
@@ -62,15 +64,16 @@ jobs:
           region=$(awk -F '"' '{print $2;exit}' < infrastructure/environments/${{ env.ENVIRONMENT }}/env_vars.yaml)
           echo "Region=${region}"
           
-          ./misc/push_lambda_image.sh ${{ env.AWS_ACCOUNT }} $region source/backend/product_prices_collector/parent
-          
+          (cd source/backend/product_prices_collector/parent && \
+          ../../../../misc/push_lambda_image.sh ${{ env.AWS_ACCOUNT }} $region)
 
       - name: "🔍 push product-prices-collector-child docker image to ECR"
         run: |
           region=$(awk -F '"' '{print $2;exit}' < infrastructure/environments/${{ env.ENVIRONMENT }}/env_vars.yaml)
           echo "Region=${region}"
           
-          ./misc/push_lambda_image.sh ${{ env.AWS_ACCOUNT }} $region source/backend/product_prices_collector/child
+          (cd source/backend/product_prices_collector/child && \
+          ../../../../misc/push_lambda_image.sh ${{ env.AWS_ACCOUNT }} $region)
 
 #      - name: "🔧 install terraform 1.3.8"
 #        uses: hashicorp/setup-terraform@v2
