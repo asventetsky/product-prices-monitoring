@@ -1,4 +1,4 @@
 region: "eu-north-1"
 lambda_product_prices_collector_schedule: "cron(0 8 1 * ? *)"
-lambda_product_prices_collector_parent_image_uri: "<placeholder>"
-lambda_product_prices_collector_child_image_uri: "<placeholder>"
+lambda_product_prices_collector_parent_image_uri: "<placeholder_parent>"
+lambda_product_prices_collector_child_image_uri: "<placeholder_child>"

@@ -3,7 +3,7 @@
 prepare_terragrunt_variables() {
   AWS_ACCOUNT=$1
   ENVIRONMENT=$2
-  VAR_TO_UPDATE=$3
+  PLACEHOLDER=$3
 
   PATH_TO_ENV_VARS="./../../../../infrastructure/environments/${ENVIRONMENT}/env_vars.yaml"
 
@@ -12,7 +12,8 @@ prepare_terragrunt_variables() {
   IMAGE_URI="${AWS_ACCOUNT}.dkr.ecr.${REGION}.amazonaws.com/${LAMBDA_NAME_AND_VERSION}"
   IMAGE_URI_ESC=$(sed 's/[\/\.]/\\&/g' <<<"$IMAGE_URI")
 
-  sed -i -e 's/${VAR_TO_UPDATE}: "[^"]*"/${VAR_TO_UPDATE}: "'"$IMAGE_URI_ESC"'"/g' $PATH_TO_ENV_VARS
+  sed -i "s/<$PLACEHOLDER>/$IMAGE_URI_ESC/g" "$PATH_TO_ENV_VARS"
+
   cat $PATH_TO_ENV_VARS
 }
 

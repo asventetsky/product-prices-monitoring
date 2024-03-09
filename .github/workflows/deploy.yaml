@@ -92,10 +92,10 @@ jobs:
       - name: "🔍 prepare environment vars"
         run: |    
           (cd source/backend/product_prices_collector/parent && \
-          ../../../../misc/prepare_terragrunt_variables.sh ${{ env.AWS_ACCOUNT }} ${{ env.ENVIRONMENT }} lambda_product_prices_collector_parent_image_uri)
+          ../../../../misc/prepare_terragrunt_variables.sh ${{ env.AWS_ACCOUNT }} ${{ env.ENVIRONMENT }} placeholder_parent)
           
           (cd source/backend/product_prices_collector/child && \
-          ../../../../misc/prepare_terragrunt_variables.sh ${{ env.AWS_ACCOUNT }} ${{ env.ENVIRONMENT }} lambda_product_prices_collector_child_image_uri)
+          ../../../../misc/prepare_terragrunt_variables.sh ${{ env.AWS_ACCOUNT }} ${{ env.ENVIRONMENT }} placeholder_child)
 
       - name: "🔍 run terragrunt init and terragrunt apply"
         run: |
