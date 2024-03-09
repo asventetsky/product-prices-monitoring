@@ -17,7 +17,7 @@ prepare_terragrunt_variables() {
 }
 
 main() {
-  prepare_terragrunt_variables
+  prepare_terragrunt_variables $1 $2 $3
 }
 
 main "$@"; exit
