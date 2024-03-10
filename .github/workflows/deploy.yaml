@@ -6,6 +6,7 @@ on:
   push:
     branches:
       - main
+      - feature/update-python-version
 
 jobs:
   build:
@@ -15,10 +16,10 @@ jobs:
       - name: "☁️ checkout repository"
         uses: actions/checkout@v4
 
-      - name: "🔧 install python 3.11"
-        uses: actions/setup-python@v4
+      - name: "🔧 install python 3.12"
+        uses: actions/setup-python@v5
         with:
-          python-version: '3.11'
+          python-version: '3.12'
 
       - name: "🔍 build product-prices-collector-parent docker image"
         run: |
@@ -31,14 +32,14 @@ jobs:
           ../../../../misc/build.sh)
 
       - name: "💾 save product prices collector lambda docker images"
-        uses: actions/cache@v3
+        uses: actions/cache@v4
         with:
           key: product-prices-collector-artifacts-${{ github.run_number }}
           path: ./source/backend/product_prices_collector/target
 
   deploy-dev:
     name: Deploy application to DEV
-    if: ${{ github.event_name == 'workflow_dispatch' }}
+#    if: ${{ github.event_name == 'workflow_dispatch' }}
     environment: dev
     needs: build
     runs-on: ubuntu-latest
@@ -52,7 +53,7 @@ jobs:
         uses: actions/checkout@v4
 
       - name: "💾 fetch lambdas docker images"
-        uses: actions/cache@v3
+        uses: actions/cache@v4
         with:
           key: product-prices-collector-artifacts-${{ github.run_number }}
           path: ./source/backend/product_prices_collector/target
