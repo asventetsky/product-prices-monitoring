@@ -1,6 +1,6 @@
 """ Test module """
 
-from datetime import date
+from datetime import datetime
 import unittest
 from unittest.mock import MagicMock, patch
 
@@ -66,7 +66,8 @@ class TestProductPricesCollectorService(unittest.TestCase):
                 "loyaltyPrice": 7295,
                 "shownPrice": 7295
             },
-            "date": date.today()
+            # TODO: introduce current datetime provider
+            "date": datetime.now().date().strftime("%Y-%m-%d")
         }
 
         self.assertEqual(actual_response, expected_response)
@@ -118,7 +119,7 @@ class TestProductPricesCollectorService(unittest.TestCase):
                 "loyaltyPrice": 7295,
                 "shownPrice": 7295
             },
-            "date": date.today()
+            "date": datetime.now().date().strftime("%Y-%m-%d")
         }
 
         actual_response = store_product_price(product_price)
@@ -142,7 +143,7 @@ class TestProductPricesCollectorService(unittest.TestCase):
                 "loyaltyPrice": 7295,
                 "shownPrice": 7295
             },
-            "date": date.today()
+            "date": datetime.now().date().strftime("%Y-%m-%d")
         }
 
         actual_response = store_product_price(product_price)

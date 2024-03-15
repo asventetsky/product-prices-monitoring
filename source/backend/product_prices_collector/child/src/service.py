@@ -3,7 +3,7 @@
 import logging
 
 
-from datetime import date
+from datetime import datetime
 from src.lambda_exception import LambdaException
 from src.client import send_request
 from src.repository import put_product
@@ -53,7 +53,7 @@ def _construct_product_price(response):
                 "loyaltyPrice": response_product_price["loyaltyPrice"],
                 "shownPrice": response_product_price["shownPrice"]
             },
-            "date": date.today()
+            "date": datetime.now().date().strftime("%Y-%m-%d")
         }
         return product_price
     except Exception as exception:
