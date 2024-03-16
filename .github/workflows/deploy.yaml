@@ -173,6 +173,10 @@ jobs:
     needs: [build, deploy-dev, deploy-prod]
     if: ${{ github.event_name == 'workflow_dispatch' && !failure() && !cancelled() }}
     runs-on: ubuntu-latest
+    permissions:
+      # Give the default GITHUB_TOKEN write permission to commit and push the
+      # added or changed files to the repository.
+      contents: write
     steps:
       - name: "☁️ checkout repository"
         uses: actions/checkout@v4
