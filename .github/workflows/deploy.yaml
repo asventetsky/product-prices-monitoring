@@ -8,170 +8,170 @@ on:
       - main
 
 jobs:
-  build:
-    name: Build application
-    runs-on: ubuntu-latest
-    steps:
-      - name: "☁️ checkout repository"
-        uses: actions/checkout@v4
-
-      - name: "🔧 install python 3.12"
-        uses: actions/setup-python@v5
-        with:
-          python-version: '3.12'
-
-      - name: "🔍 build product-prices-collector-parent docker image"
-        run: |
-          (cd source/backend/product_prices_collector/parent && \
-          ../../../../misc/build.sh)
-
-      - name: "🔍 build product-prices-collector-child docker image"
-        run: |
-          (cd source/backend/product_prices_collector/child && \
-          ../../../../misc/build.sh)
-
-      - name: "💾 save product prices collector lambda docker images"
-        uses: actions/cache@v4
-        with:
-          key: product-prices-collector-artifacts-${{ github.run_number }}
-          path: ./source/backend/product_prices_collector/target
-
-  deploy-dev:
-    name: Deploy application to DEV
-    if: ${{ github.event_name == 'workflow_dispatch' }}
-    environment: dev
-    needs: build
-    runs-on: ubuntu-latest
-    env:
-      AWS_ACCOUNT: ${{ secrets.AWS_ACCOUNT }}
-      AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
-      AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-      ENVIRONMENT: dev
-    steps:
-      - name: "☁️ checkout repository"
-        uses: actions/checkout@v4
-
-      - name: "💾 fetch lambdas docker images"
-        uses: actions/cache@v4
-        with:
-          key: product-prices-collector-artifacts-${{ github.run_number }}
-          path: ./source/backend/product_prices_collector/target
-          fail-on-cache-miss: true
-
-      - name: "🔍 push product-prices-collector-parent docker image to ECR"
-        run: |
-          region=$(awk -F '"' '{print $2;exit}' < infrastructure/environments/${{ env.ENVIRONMENT }}/env_vars.yaml)
-          echo "Region=${region}"
-          
-          (cd source/backend/product_prices_collector/parent && \
-          ../../../../misc/push_lambda_image.sh ${{ env.AWS_ACCOUNT }} $region)
-
-      - name: "🔍 push product-prices-collector-child docker image to ECR"
-        run: |
-          region=$(awk -F '"' '{print $2;exit}' < infrastructure/environments/${{ env.ENVIRONMENT }}/env_vars.yaml)
-          echo "Region=${region}"
-          
-          (cd source/backend/product_prices_collector/child && \
-          ../../../../misc/push_lambda_image.sh ${{ env.AWS_ACCOUNT }} $region)
-
-      - name: "🔧 install terraform 1.3.8"
-        uses: hashicorp/setup-terraform@v3
-        with:
-          terraform_version: 1.3.8
-
-      - name: "🔧 install terragrunt 0.43.2"
-        run: |
-          curl -LJO https://github.com/gruntwork-io/terragrunt/releases/download/v0.43.2/terragrunt_linux_amd64
-          mv terragrunt_linux_amd64 terragrunt
-          chmod +x terragrunt
-          sudo mv terragrunt /usr/local/bin
-          ls -l /usr/local/bin
-          terragrunt --version
-
-      - name: "🔍 prepare environment vars"
-        run: |    
-          (cd source/backend/product_prices_collector/parent && \
-          ../../../../misc/prepare_terragrunt_variables.sh ${{ env.AWS_ACCOUNT }} ${{ env.ENVIRONMENT }} placeholder_parent)
-          
-          (cd source/backend/product_prices_collector/child && \
-          ../../../../misc/prepare_terragrunt_variables.sh ${{ env.AWS_ACCOUNT }} ${{ env.ENVIRONMENT }} placeholder_child)
-
-      - name: "🔍 run terragrunt init and terragrunt apply"
-        run: |
-          (cd infrastructure/environments/${{ env.ENVIRONMENT }} && \
-          terragrunt init --terragrunt-non-interactive && \
-          terragrunt apply -auto-approve)
-
-  deploy-prod:
-    name: Deploy application to PROD
-    if: ${{ github.event_name == 'workflow_dispatch' && startsWith(github.ref_name, 'release') }}
-    environment: prod
-    needs: build
-    runs-on: ubuntu-latest
-    env:
-      AWS_ACCOUNT: ${{ secrets.AWS_ACCOUNT }}
-      AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
-      AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-      ENVIRONMENT: prod
-    steps:
-      - name: "☁️ checkout repository"
-        uses: actions/checkout@v4
-
-      - name: "💾 fetch lambdas docker images"
-        uses: actions/cache@v4
-        with:
-          key: product-prices-collector-artifacts-${{ github.run_number }}
-          path: ./source/backend/product_prices_collector/target
-          fail-on-cache-miss: true
-
-      - name: "🔍 push product-prices-collector-parent docker image to ECR"
-        run: |
-          region=$(awk -F '"' '{print $2;exit}' < infrastructure/environments/${{ env.ENVIRONMENT }}/env_vars.yaml)
-          echo "Region=${region}"
-          
-          (cd source/backend/product_prices_collector/parent && \
-          ../../../../misc/push_lambda_image.sh ${{ env.AWS_ACCOUNT }} $region)
-
-      - name: "🔍 push product-prices-collector-child docker image to ECR"
-        run: |
-          region=$(awk -F '"' '{print $2;exit}' < infrastructure/environments/${{ env.ENVIRONMENT }}/env_vars.yaml)
-          echo "Region=${region}"
-          
-          (cd source/backend/product_prices_collector/child && \
-          ../../../../misc/push_lambda_image.sh ${{ env.AWS_ACCOUNT }} $region)
-
-      - name: "🔧 install terraform 1.3.8"
-        uses: hashicorp/setup-terraform@v3
-        with:
-          terraform_version: 1.3.8
-
-      - name: "🔧 install terragrunt 0.43.2"
-        run: |
-          curl -LJO https://github.com/gruntwork-io/terragrunt/releases/download/v0.43.2/terragrunt_linux_amd64
-          mv terragrunt_linux_amd64 terragrunt
-          chmod +x terragrunt
-          sudo mv terragrunt /usr/local/bin
-          ls -l /usr/local/bin
-          terragrunt --version
-
-      - name: "🔍 prepare environment vars"
-        run: |
-          (cd source/backend/product_prices_collector/parent && \
-          ../../../../misc/prepare_terragrunt_variables.sh ${{ env.AWS_ACCOUNT }} ${{ env.ENVIRONMENT }} placeholder_parent)
-          
-          (cd source/backend/product_prices_collector/child && \
-          ../../../../misc/prepare_terragrunt_variables.sh ${{ env.AWS_ACCOUNT }} ${{ env.ENVIRONMENT }} placeholder_child)
-
-      - name: "🔍 run terragrunt init and terragrunt apply"
-        run: |
-          (cd infrastructure/environments/${{ env.ENVIRONMENT }} && \
-          terragrunt init --terragrunt-non-interactive && \
-          terragrunt apply -auto-approve)
+#  build:
+#    name: Build application
+#    runs-on: ubuntu-latest
+#    steps:
+#      - name: "☁️ checkout repository"
+#        uses: actions/checkout@v4
+#
+#      - name: "🔧 install python 3.12"
+#        uses: actions/setup-python@v5
+#        with:
+#          python-version: '3.12'
+#
+#      - name: "🔍 build product-prices-collector-parent docker image"
+#        run: |
+#          (cd source/backend/product_prices_collector/parent && \
+#          ../../../../misc/build.sh)
+#
+#      - name: "🔍 build product-prices-collector-child docker image"
+#        run: |
+#          (cd source/backend/product_prices_collector/child && \
+#          ../../../../misc/build.sh)
+#
+#      - name: "💾 save product prices collector lambda docker images"
+#        uses: actions/cache@v4
+#        with:
+#          key: product-prices-collector-artifacts-${{ github.run_number }}
+#          path: ./source/backend/product_prices_collector/target
+#
+#  deploy-dev:
+#    name: Deploy application to DEV
+#    if: ${{ github.event_name == 'workflow_dispatch' }}
+#    environment: dev
+#    needs: build
+#    runs-on: ubuntu-latest
+#    env:
+#      AWS_ACCOUNT: ${{ secrets.AWS_ACCOUNT }}
+#      AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+#      AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+#      ENVIRONMENT: dev
+#    steps:
+#      - name: "☁️ checkout repository"
+#        uses: actions/checkout@v4
+#
+#      - name: "💾 fetch lambdas docker images"
+#        uses: actions/cache@v4
+#        with:
+#          key: product-prices-collector-artifacts-${{ github.run_number }}
+#          path: ./source/backend/product_prices_collector/target
+#          fail-on-cache-miss: true
+#
+#      - name: "🔍 push product-prices-collector-parent docker image to ECR"
+#        run: |
+#          region=$(awk -F '"' '{print $2;exit}' < infrastructure/environments/${{ env.ENVIRONMENT }}/env_vars.yaml)
+#          echo "Region=${region}"
+#
+#          (cd source/backend/product_prices_collector/parent && \
+#          ../../../../misc/push_lambda_image.sh ${{ env.AWS_ACCOUNT }} $region)
+#
+#      - name: "🔍 push product-prices-collector-child docker image to ECR"
+#        run: |
+#          region=$(awk -F '"' '{print $2;exit}' < infrastructure/environments/${{ env.ENVIRONMENT }}/env_vars.yaml)
+#          echo "Region=${region}"
+#
+#          (cd source/backend/product_prices_collector/child && \
+#          ../../../../misc/push_lambda_image.sh ${{ env.AWS_ACCOUNT }} $region)
+#
+#      - name: "🔧 install terraform 1.3.8"
+#        uses: hashicorp/setup-terraform@v3
+#        with:
+#          terraform_version: 1.3.8
+#
+#      - name: "🔧 install terragrunt 0.43.2"
+#        run: |
+#          curl -LJO https://github.com/gruntwork-io/terragrunt/releases/download/v0.43.2/terragrunt_linux_amd64
+#          mv terragrunt_linux_amd64 terragrunt
+#          chmod +x terragrunt
+#          sudo mv terragrunt /usr/local/bin
+#          ls -l /usr/local/bin
+#          terragrunt --version
+#
+#      - name: "🔍 prepare environment vars"
+#        run: |
+#          (cd source/backend/product_prices_collector/parent && \
+#          ../../../../misc/prepare_terragrunt_variables.sh ${{ env.AWS_ACCOUNT }} ${{ env.ENVIRONMENT }} placeholder_parent)
+#
+#          (cd source/backend/product_prices_collector/child && \
+#          ../../../../misc/prepare_terragrunt_variables.sh ${{ env.AWS_ACCOUNT }} ${{ env.ENVIRONMENT }} placeholder_child)
+#
+#      - name: "🔍 run terragrunt init and terragrunt apply"
+#        run: |
+#          (cd infrastructure/environments/${{ env.ENVIRONMENT }} && \
+#          terragrunt init --terragrunt-non-interactive && \
+#          terragrunt apply -auto-approve)
+#
+#  deploy-prod:
+#    name: Deploy application to PROD
+#    if: ${{ github.event_name == 'workflow_dispatch' && startsWith(github.ref_name, 'release') }}
+#    environment: prod
+#    needs: build
+#    runs-on: ubuntu-latest
+#    env:
+#      AWS_ACCOUNT: ${{ secrets.AWS_ACCOUNT }}
+#      AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+#      AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+#      ENVIRONMENT: prod
+#    steps:
+#      - name: "☁️ checkout repository"
+#        uses: actions/checkout@v4
+#
+#      - name: "💾 fetch lambdas docker images"
+#        uses: actions/cache@v4
+#        with:
+#          key: product-prices-collector-artifacts-${{ github.run_number }}
+#          path: ./source/backend/product_prices_collector/target
+#          fail-on-cache-miss: true
+#
+#      - name: "🔍 push product-prices-collector-parent docker image to ECR"
+#        run: |
+#          region=$(awk -F '"' '{print $2;exit}' < infrastructure/environments/${{ env.ENVIRONMENT }}/env_vars.yaml)
+#          echo "Region=${region}"
+#
+#          (cd source/backend/product_prices_collector/parent && \
+#          ../../../../misc/push_lambda_image.sh ${{ env.AWS_ACCOUNT }} $region)
+#
+#      - name: "🔍 push product-prices-collector-child docker image to ECR"
+#        run: |
+#          region=$(awk -F '"' '{print $2;exit}' < infrastructure/environments/${{ env.ENVIRONMENT }}/env_vars.yaml)
+#          echo "Region=${region}"
+#
+#          (cd source/backend/product_prices_collector/child && \
+#          ../../../../misc/push_lambda_image.sh ${{ env.AWS_ACCOUNT }} $region)
+#
+#      - name: "🔧 install terraform 1.3.8"
+#        uses: hashicorp/setup-terraform@v3
+#        with:
+#          terraform_version: 1.3.8
+#
+#      - name: "🔧 install terragrunt 0.43.2"
+#        run: |
+#          curl -LJO https://github.com/gruntwork-io/terragrunt/releases/download/v0.43.2/terragrunt_linux_amd64
+#          mv terragrunt_linux_amd64 terragrunt
+#          chmod +x terragrunt
+#          sudo mv terragrunt /usr/local/bin
+#          ls -l /usr/local/bin
+#          terragrunt --version
+#
+#      - name: "🔍 prepare environment vars"
+#        run: |
+#          (cd source/backend/product_prices_collector/parent && \
+#          ../../../../misc/prepare_terragrunt_variables.sh ${{ env.AWS_ACCOUNT }} ${{ env.ENVIRONMENT }} placeholder_parent)
+#
+#          (cd source/backend/product_prices_collector/child && \
+#          ../../../../misc/prepare_terragrunt_variables.sh ${{ env.AWS_ACCOUNT }} ${{ env.ENVIRONMENT }} placeholder_child)
+#
+#      - name: "🔍 run terragrunt init and terragrunt apply"
+#        run: |
+#          (cd infrastructure/environments/${{ env.ENVIRONMENT }} && \
+#          terragrunt init --terragrunt-non-interactive && \
+#          terragrunt apply -auto-approve)
 
   post-deploy:
     name: Post deploy actions
-    needs: [build, deploy-dev, deploy-prod]
-    if: ${{ github.event_name == 'workflow_dispatch' && !failure() && !cancelled() }}
+#    needs: [build, deploy-dev, deploy-prod]
+#    if: ${{ github.event_name == 'workflow_dispatch' && !failure() && !cancelled() }}
     runs-on: ubuntu-latest
     permissions:
       # Give the default GITHUB_TOKEN write permission to commit and push the
