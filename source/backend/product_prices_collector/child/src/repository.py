@@ -40,7 +40,7 @@ def put_product_price(product_price):
             "salePrice": {"N": str(product_price["price"]["salePrice"])},
             "loyaltyPrice": {"N": str(product_price["price"]["loyaltyPrice"])},
             "shownPrice": {"N": str(product_price["price"]["shownPrice"])},
-            "date": {"S": product_price["date"].strftime("%d-%m-%Y")}
+            "date": {"S": product_price["date"]}
         }
         client.put_item(
             TableName=PRODUCT_PRICES_TABLE_NAME,
