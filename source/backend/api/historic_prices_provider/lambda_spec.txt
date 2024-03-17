@@ -1,0 +1,2 @@
+name=lambda_product_prices_collector_child
+version=0.0.34-snapshot

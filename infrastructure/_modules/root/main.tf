@@ -134,3 +134,66 @@ module "lambda_product_prices_collector_child" {
 
   resource_tags = var.resource_tags
 }
+
+#==================================================#
+# API GATEWAY: expose endpoint for historic prices #
+#==================================================#
+module "api_gateway" {
+  source = "../../../../../_modules/api_gateway"
+
+  api_gateway_name = "product-pricess-monitoring-app-${var.region}-${var.env}"
+  cognito_auth = false
+  stage = var.env
+
+  integrations = {
+    "GET /product-prices" = {
+      lambda_invoke_arn = module.lambda_reminders_get.lambda_invoke_arn
+      lambda_function_name = module.lambda_reminders_get.lambda_name
+    }
+  }
+}
+
+#=================================#
+# LAMBDA: provide historic prices #
+#=================================#
+data "aws_iam_policy_document" "product_prices_collector_child" {
+  statement {
+    actions   = ["logs:CreateLogStream", "logs:PutLogEvents"]
+    resources = ["arn:aws:logs:*:*:*"]
+    effect = "Allow"
+  }
+  statement {
+    actions   = ["dynamodb:Query"]
+    resources = [module.dynamo_db_product_prices_table.table_arn, "${module.dynamo_db_product_prices_table.table_arn}/index/*"]
+    effect = "Allow"
+  }
+}
+
+module "lambda_prices_collector_iam_role" {
+  source = "github.com/asventetsky/freecodecamp-aws-serverless-projects-common//terraform/module/aws/lambda_iam_role?ref=1c71f0bcea456cecbedfc8b67cc540144217bb8d"
+
+  region = var.region
+  env = var.env
+  lambda_name = "lambda_product_prices_collector_child"
+  policy_json_string = data.aws_iam_policy_document.product_prices_collector_child.json
+
+  resource_tags = var.resource_tags
+}
+
+module "lambda_product_prices_collector_child" {
+  source = "../../../../../_modules/lambda_docker_image"
+
+  name = "lambda_product_prices_collector_child"
+  region = var.region
+  env = var.env
+  lambda_role_arn = module.lambda_prices_collector_iam_role.arn
+  image_uri = var.lambda_product_prices_collector_child_image_uri
+
+  environment_variables = {
+    REGION = var.region
+    PRODUCTS_TABLE_NAME = module.dynamo_db_products_table.table_name
+    PRODUCT_PRICES_TABLE_NAME = module.dynamo_db_product_prices_table.table_name
+  }
+
+  resource_tags = var.resource_tags
+}
