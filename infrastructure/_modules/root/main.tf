@@ -33,6 +33,16 @@ module "dynamo_db_product_prices_table" {
   resource_tags = var.resource_tags
 }
 
+module "dynamo_db_historic_product_prices" {
+  source = "../../../../../_modules/dynamo_db"
+
+  table_name = "historic_product_prices"
+  partition_key = "product_id"
+  range_key = "date"
+
+  resource_tags = var.resource_tags
+}
+
 #========================================================================#
 # PRODUCT PRICES COLLECTOR PARENT: lambda function, iam role and trigger #
 #========================================================================#
@@ -101,7 +111,7 @@ data "aws_iam_policy_document" "product_prices_collector_child" {
   }
   statement {
     actions   = ["dynamodb:PutItem"]
-    resources = [module.dynamo_db_products_table.table_arn, module.dynamo_db_product_prices_table.table_arn]
+    resources = [module.dynamo_db_products_table.table_arn, module.dynamo_db_historic_product_prices.table_arn]
     effect = "Allow"
   }
 }
@@ -129,7 +139,7 @@ module "lambda_product_prices_collector_child" {
   environment_variables = {
     REGION = var.region
     PRODUCTS_TABLE_NAME = module.dynamo_db_products_table.table_name
-    PRODUCT_PRICES_TABLE_NAME = module.dynamo_db_product_prices_table.table_name
+    PRODUCT_PRICES_TABLE_NAME = module.dynamo_db_historic_product_prices.table_name
   }
 
   resource_tags = var.resource_tags
