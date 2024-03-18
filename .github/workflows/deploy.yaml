@@ -6,7 +6,6 @@ on:
   push:
     branches:
       - main
-      - feature/adjust-product-price-format-for-historic-prices
 
 jobs:
   build:
@@ -39,7 +38,7 @@ jobs:
 
   deploy-dev:
     name: Deploy application to DEV
-#    if: ${{ github.event_name == 'workflow_dispatch' }}
+    if: ${{ github.event_name == 'workflow_dispatch' }}
     environment: dev
     needs: build
     runs-on: ubuntu-latest
@@ -171,8 +170,8 @@ jobs:
 
   post-deploy:
     name: Post deploy actions
-    needs: [build, deploy-dev]
-#    if: ${{ github.event_name == 'workflow_dispatch' && !failure() && !cancelled() }}
+    needs: [build, deploy-dev, deploy-prod]
+    if: ${{ github.event_name == 'workflow_dispatch' && !failure() && !cancelled() }}
     runs-on: ubuntu-latest
     permissions:
       # Give the default GITHUB_TOKEN write permission to commit and push the
