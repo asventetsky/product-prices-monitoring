@@ -8,12 +8,12 @@ NEW_TABLE_NAME = os.environ["NEW_TABLE_NAME"]
 
 
 def fetch_product_prices():
-    # print("Fetching product prices...")
-    # response = client.scan(TableName=OLD_TABLE_NAME)
-    # return response['Items']
+    print("Fetching product prices...")
+    response = client.scan(TableName=OLD_TABLE_NAME)
+    return response['Items']
 
-    with open('product_prices.txt', 'r') as file:
-        return json.load(file)
+    # with open('product_prices.txt', 'r') as file:
+    #     return json.load(file)
 
 
 def store_product_prices(product_prices):
