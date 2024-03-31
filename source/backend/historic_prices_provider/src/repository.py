@@ -8,12 +8,31 @@ import boto3
 
 client = boto3.client(
     "dynamodb",
-    aws_access_key_id=os.environ["AWS_ACCESS_KEY_ID"],
-    aws_secret_access_key=os.environ["AWS_SECRET_ACCESS_KEY"],
-    region_name=os.environ["REGION"])
+    region_name=os.environ["AWS_REGION"],
+    endpoint_url=os.environ["DYNAMODB_ENDPOINT"]
+)
+PRODUCTS_TABLE_NAME = os.environ["PRODUCTS_TABLE_NAME"]
 PRODUCT_PRICES_TABLE_NAME = os.environ["PRODUCT_PRICES_TABLE_NAME"]
 
 logging.getLogger().setLevel(logging.INFO)
+
+def get_product(product_id):
+    logging.info(
+        "product_id: %s", product_id
+    )
+
+    try:
+        return client.query(
+            TableName=PRODUCTS_TABLE_NAME,
+            ProjectionExpression="id, #nm",
+            ExpressionAttributeNames={"#nm": "name"},
+            KeyConditionExpression="id = :v1",
+            ExpressionAttributeValues={
+                ":v1": {"N": product_id}
+            },
+        )
+    except botocore.exceptions.ClientError as error:
+        logging.error("Unable to get product by id `%s`: %s", product_id, error)
 
 
 def get_product_price(product_id, period):

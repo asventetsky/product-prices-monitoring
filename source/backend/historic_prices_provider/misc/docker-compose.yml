@@ -1,0 +1,76 @@
+version: "3.8"
+
+services:
+
+  historic-prices-provider:
+    depends_on:
+      dynamodb:
+        condition: service_healthy
+    image: "historic-prices-provider:latest"
+    build: ./..
+    ports:
+      - 9000:8080
+    environment:
+      - DYNAMODB_ENDPOINT=http://dynamodb:4566
+      - PRODUCTS_TABLE_NAME=products
+      - PRODUCT_PRICES_TABLE_NAME=product-prices
+      - AWS_REGION=eu-central-1
+      - AWS_ACCESS_KEY_ID=accesskeyid
+      - AWS_SECRET_ACCESS_KEY=secretaccesskey
+    volumes:
+      - ./../src:/var/task/src
+
+  dynamodb:
+#    container_name: "${LOCALSTACK_DOCKER_NAME:-localstack-main}"
+    image: localstack/localstack
+    ports:
+      - "127.0.0.1:4566:4566"            # LocalStack Gateway
+      - "127.0.0.1:4510-4559:4510-4559"  # external services port range
+    environment:
+      # LocalStack configuration: https://docs.localstack.cloud/references/configuration/
+      - DEBUG=0
+      - SERVICES=dynamodb
+#    volumes:
+#      - "${LOCALSTACK_VOLUME_DIR:-./volume}:/var/lib/localstack"
+#      - "/var/run/docker.sock:/var/run/docker.sock"
+    healthcheck:
+      test: [ "CMD", "curl", "-f", "http://localhost:4566" ]
+      interval: 5s
+      timeout: 5s
+      retries: 2
+      start_period: 5s
+
+#  dynamodb-configure:
+#    depends_on:
+#      dynamodb:
+#        condition: service_healthy
+#    image: docker
+#    command:
+#      - /bin/sh
+#      - -c
+#      - |
+#        docker run --rm -i amazon/aws-cli dynamodb create-table --table-name product-prices --attribute-definitions AttributeName=product_id,AttributeType=S AttributeName=date,AttributeType=S --key-schema AttributeName=product_id,KeyType=HASH AttributeName=date,KeyType=RANGE --provisioned-throughput ReadCapacityUnits=5,WriteCapacityUnits=5 --endpoint-url http://dynamodb-local:8000 --region eu-central-1
+      
+      
+#      dynamodb batch-write-item \
+#      --request-items file://request-items.json \
+#      --endpoint-url http://dynamodb-local:8000 \
+#      --region eu-central-1
+
+
+
+#  dynamodb-local:
+#    image: "amazon/dynamodb-local:2.3.0"
+#    container_name: "dynamodb-local"
+#    ports:
+#      - 8000:8000
+#    environment:
+#      - AWS_REGION=eu-central-1
+#      - AWS_ACCESS_KEY_ID=accesskeyid
+#      - AWS_SECRET_ACCESS_KEY=secretaccesskey
+##    healthcheck:
+##      test: [ "CMD", "curl", "-f", "http://localhost:8000" ]
+##      interval: 1m30s
+##      timeout: 10s
+##      retries: 3
+##      start_period: 4s
