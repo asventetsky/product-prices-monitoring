@@ -1,0 +1,12 @@
+{
+  "products": [
+    {
+      "PutRequest": {
+        "Item": {
+          "id": {"N": "20000008040938"},
+          "name": {"S": "Akmina +C Vitaminli Limon Aromalı Maden Suyu 6X200 Ml"}
+        }
+      }
+    }
+  ]
+}

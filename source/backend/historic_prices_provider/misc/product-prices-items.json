@@ -1,0 +1,88 @@
+{
+  "product-prices": [
+    {
+      "PutRequest": {
+        "Item": {
+          "product_id": {"N": "20000008040938"},
+          "date": {"S": "2024-03-25"},
+          "regularPrice": {"N": "12990"},
+          "salePrice": {"N": "12990"},
+          "loyaltyPrice": {"N": "12990"},
+          "shownPrice": {"N": "12990"}
+        }
+      }
+    },
+    {
+      "PutRequest": {
+        "Item": {
+          "product_id": {"N": "20000008040938"},
+          "date": {"S": "2024-03-26"},
+          "regularPrice": {"N": "13000"},
+          "salePrice": {"N": "13000"},
+          "loyaltyPrice": {"N": "13000"},
+          "shownPrice": {"N": "13000"}
+        }
+      }
+    },
+    {
+      "PutRequest": {
+        "Item": {
+          "product_id": {"N": "20000008040938"},
+          "date": {"S": "2024-03-27"},
+          "regularPrice": {"N": "13100"},
+          "salePrice": {"N": "13100"},
+          "loyaltyPrice": {"N": "13100"},
+          "shownPrice": {"N": "13100"}
+        }
+      }
+    },
+    {
+      "PutRequest": {
+        "Item": {
+          "product_id": {"N": "20000008040938"},
+          "date": {"S": "2024-03-28"},
+          "regularPrice": {"N": "13200"},
+          "salePrice": {"N": "13200"},
+          "loyaltyPrice": {"N": "13200"},
+          "shownPrice": {"N": "13200"}
+        }
+      }
+    },
+    {
+      "PutRequest": {
+        "Item": {
+          "product_id": {"N": "20000008040938"},
+          "date": {"S": "2024-03-29"},
+          "regularPrice": {"N": "13300"},
+          "salePrice": {"N": "13300"},
+          "loyaltyPrice": {"N": "13300"},
+          "shownPrice": {"N": "13300"}
+        }
+      }
+    },
+    {
+      "PutRequest": {
+        "Item": {
+          "product_id": {"N": "20000008040938"},
+          "date": {"S": "2024-03-30"},
+          "regularPrice": {"N": "13400"},
+          "salePrice": {"N": "13400"},
+          "loyaltyPrice": {"N": "13400"},
+          "shownPrice": {"N": "13400"}
+        }
+      }
+    },
+    {
+      "PutRequest": {
+        "Item": {
+          "product_id": {"N": "20000008040938"},
+          "date": {"S": "2024-03-31"},
+          "regularPrice": {"N": "13500"},
+          "salePrice": {"N": "13500"},
+          "loyaltyPrice": {"N": "13500"},
+          "shownPrice": {"N": "13500"}
+        }
+      }
+    }
+  ]
+}

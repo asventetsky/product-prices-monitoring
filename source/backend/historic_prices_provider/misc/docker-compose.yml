@@ -1,0 +1,38 @@
+version: "3.8"
+
+services:
+
+  historic-prices-provider:
+    depends_on:
+      dynamodb:
+        condition: service_healthy
+    container_name: "historic-prices-provider"
+    image: "historic-prices-provider:latest"
+    build: ./..
+    ports:
+      - 9000:8080
+    environment:
+      - DYNAMODB_ENDPOINT=http://dynamodb:4566
+      - PRODUCTS_TABLE_NAME=products
+      - PRODUCT_PRICES_TABLE_NAME=product-prices
+      - AWS_REGION=eu-central-1
+      - AWS_ACCESS_KEY_ID=accesskeyid
+      - AWS_SECRET_ACCESS_KEY=secretaccesskey
+    volumes:
+      - ./../src:/var/task/src
+
+  dynamodb:
+    container_name: "localstack-dynamodb"
+    image: "localstack/localstack"
+    ports:
+      - "127.0.0.1:4566:4566"            # LocalStack Gateway
+      - "127.0.0.1:4510-4559:4510-4559"  # external services port range
+    environment:
+      - DEBUG=0
+      - SERVICES=dynamodb
+    healthcheck:
+      test: [ "CMD", "curl", "-f", "http://localhost:4566" ]
+      interval: 5s
+      timeout: 5s
+      retries: 2
+      start_period: 5s
