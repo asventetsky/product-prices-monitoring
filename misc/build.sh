@@ -2,7 +2,8 @@
 
 build_image() {
   ARTEFACT_FOLDER=$1
-  LAMBDA_NAME_AND_VERSION=$(./../../../../misc/extract_lambda_name_version.sh)
+  LAMBDA_NAME_AND_VERSION=$("${ARTEFACT_FOLDER}"/../../misc/extract_lambda_name_version.sh)
+#  LAMBDA_NAME_AND_VERSION=$(./../../../../misc/extract_lambda_name_version.sh)
 
   echo "Building the image ${LAMBDA_NAME_AND_VERSION}"
   docker build -t "${LAMBDA_NAME_AND_VERSION}" .
