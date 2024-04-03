@@ -9,7 +9,7 @@ push_image() {
   LAMBDA_NAME_AND_VERSION=$("${RELATIVE_PATH}"../../misc/extract_lambda_name_version.sh)
 
   echo "Loading the image ${LAMBDA_NAME_AND_VERSION}"
-  docker load --input ../target/"${LAMBDA_NAME_AND_VERSION}".tar
+  docker load --input "${RELATIVE_PATH}"target/"${LAMBDA_NAME_AND_VERSION}".tar
 
   echo "Tagging the image ${LAMBDA_NAME_AND_VERSION} with ${ECR_ACCOUNT}/${LAMBDA_NAME_AND_VERSION}"
   sudo docker tag "${LAMBDA_NAME_AND_VERSION}" "${ECR_ACCOUNT}/${LAMBDA_NAME_AND_VERSION}"

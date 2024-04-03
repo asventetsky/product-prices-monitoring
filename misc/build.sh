@@ -8,8 +8,8 @@ build_image() {
   docker build -t "${LAMBDA_NAME_AND_VERSION}" .
 
   echo "Saving the image ${LAMBDA_NAME_AND_VERSION}"
-  ARTIFACT_FOLDER="${RELATIVE_ARTIFACT_PATH}"/target
-  echo "Artifact folder: ${ARTIFACT_FOLDER}"
+  ARTIFACT_FOLDER="${RELATIVE_ARTIFACT_PATH}"target
+  echo "Artifact folder: $(pwd)/$ARTIFACT_FOLDER"
   mkdir -p ${ARTIFACT_FOLDER}
   docker save "${LAMBDA_NAME_AND_VERSION}" > "${ARTIFACT_FOLDER}/${LAMBDA_NAME_AND_VERSION}".tar
 }
