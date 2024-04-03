@@ -9,8 +9,8 @@ build_image() {
   docker build -t "${LAMBDA_NAME_AND_VERSION}" .
 
   echo "Saving the image ${LAMBDA_NAME_AND_VERSION}"
-  mkdir -p $RELATIVE_ARTIFACT_FOLDER
-  docker save "${LAMBDA_NAME_AND_VERSION}" > "${RELATIVE_ARTIFACT_FOLDER}"/"${LAMBDA_NAME_AND_VERSION}".tar
+  mkdir -p $RELATIVE_ARTIFACT_FOLDER/target
+  docker save "${LAMBDA_NAME_AND_VERSION}" > "${RELATIVE_ARTIFACT_FOLDER}"/target/"${LAMBDA_NAME_AND_VERSION}".tar
 }
 
 build() {
