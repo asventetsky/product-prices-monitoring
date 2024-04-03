@@ -2,7 +2,7 @@ name: Product prices monitoring DEPLOY
 
 on:
   workflow_dispatch:
-  pull_request:
+#  pull_request:
   push:
     branches:
       - main
@@ -35,7 +35,7 @@ jobs:
       - name: "🔍 build historic_prices_provider docker image"
         run: |
           (cd source/backend/historic_prices_provider && \
-          ../../../../misc/build.sh ./../source/backend)
+          ../../../misc/build.sh ./../source/backend)
 
       - name: "💾 save product prices collector lambda docker images"
         uses: actions/cache@v4
