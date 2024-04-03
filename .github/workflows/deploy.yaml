@@ -69,6 +69,8 @@ jobs:
         run: |
           region=$(awk -F '"' '{print $2;exit}' < infrastructure/environments/${{ env.ENVIRONMENT }}/env_vars.yaml)
           echo "Region=${region}"
+          
+          ll source/backend/target
 
           (cd source/backend/product_prices_collector/parent && \
           ../../../../misc/push_lambda_image.sh ${{ env.AWS_ACCOUNT }} $region ./../../)
