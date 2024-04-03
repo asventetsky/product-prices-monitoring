@@ -1,14 +1,15 @@
 #!/bin/bash
 
 build_image() {
+  ARTEFACT_FOLDER=$1
   LAMBDA_NAME_AND_VERSION=$(./../../../../misc/extract_lambda_name_version.sh)
 
   echo "Building the image ${LAMBDA_NAME_AND_VERSION}"
   docker build -t "${LAMBDA_NAME_AND_VERSION}" .
 
   echo "Saving the image ${LAMBDA_NAME_AND_VERSION}"
-  mkdir -p ../target
-  docker save "${LAMBDA_NAME_AND_VERSION}" > ../target/"${LAMBDA_NAME_AND_VERSION}".tar
+  mkdir -p $ARTEFACT_FOLDER
+  docker save "${LAMBDA_NAME_AND_VERSION}" > "${ARTEFACT_FOLDER}"/"${LAMBDA_NAME_AND_VERSION}".tar
 }
 
 build() {
@@ -21,7 +22,7 @@ build() {
   echo "Running tests"
   python3 -m unittest
 
-  build_image
+  build_image $1
 }
 
 main() {

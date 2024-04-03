@@ -144,3 +144,71 @@ module "lambda_product_prices_collector_child" {
 
   resource_tags = var.resource_tags
 }
+
+#==================================================#
+# API GATEWAY: expose endpoint for historic prices #
+#==================================================#
+module "api_gateway" {
+  source = "../../../../../_modules/api_gateway"
+
+  api_gateway_name = "product-pricess-monitoring-app-${var.region}-${var.env}"
+  cognito_auth = false
+  stage = var.env
+
+  integrations = {
+    "GET /product-prices" = {
+      lambda_invoke_arn = module.lambda_historic_prices_provider.lambda_invoke_arn
+      lambda_function_name = module.lambda_historic_prices_provider.lambda_name
+    }
+  }
+}
+
+#=================================#
+# LAMBDA: provide historic prices #
+#=================================#
+data "aws_iam_policy_document" "historic_prices_provider" {
+  statement {
+    actions   = ["logs:CreateLogStream", "logs:PutLogEvents"]
+    resources = ["arn:aws:logs:*:*:*"]
+    effect = "Allow"
+  }
+  statement {
+    actions   = ["dynamodb:Query"]
+    resources = [
+      module.dynamo_db_products_table.table_arn,
+      "${module.dynamo_db_products_table.table_arn}/index/*",
+      module.dynamo_db_historic_product_prices.table_arn,
+      "${module.dynamo_db_historic_product_prices.table_arn}/index/*",
+    ]
+    effect = "Allow"
+  }
+}
+
+module "lambda_historic_prices_provider_iam_role" {
+  source = "github.com/asventetsky/freecodecamp-aws-serverless-projects-common//terraform/module/aws/lambda_iam_role?ref=1c71f0bcea456cecbedfc8b67cc540144217bb8d"
+
+  region = var.region
+  env = var.env
+  lambda_name = "lambda_historic_prices_provider"
+  policy_json_string = data.aws_iam_policy_document.historic_prices_provider.json
+
+  resource_tags = var.resource_tags
+}
+
+module "lambda_historic_prices_provider" {
+  source = "../../../../../_modules/lambda_docker_image"
+
+  name = "lambda_historic_prices_provider"
+  region = var.region
+  env = var.env
+  lambda_role_arn = module.lambda_historic_prices_provider_iam_role.arn
+  image_uri = var.lambda_historic_prices_provider_image_uri
+
+  environment_variables = {
+    REGION = var.region
+    PRODUCTS_TABLE_NAME = module.dynamo_db_products_table.table_name
+    PRODUCT_PRICES_TABLE_NAME = module.dynamo_db_historic_product_prices.table_name
+  }
+
+  resource_tags = var.resource_tags
+}
