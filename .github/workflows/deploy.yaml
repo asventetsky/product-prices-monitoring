@@ -25,17 +25,17 @@ jobs:
       - name: "🔍 build product-prices-collector-parent docker image"
         run: |
           (cd source/backend/product_prices_collector/parent && \
-          ../../../../misc/build.sh ./../../source/backend)
+          ../../../../misc/build.sh ./../../)
 
       - name: "🔍 build product-prices-collector-child docker image"
         run: |
           (cd source/backend/product_prices_collector/child && \
-          ../../../../misc/build.sh ./../../source/backend)
+          ../../../../misc/build.sh ./../../)
 
       - name: "🔍 build historic_prices_provider docker image"
         run: |
           (cd source/backend/historic_prices_provider && \
-          ../../../misc/build.sh ./../source/backend)
+          ../../../misc/build.sh ./../)
 
       - name: "💾 save product prices collector lambda docker images"
         uses: actions/cache@v4
