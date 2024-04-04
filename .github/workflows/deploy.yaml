@@ -68,7 +68,6 @@ jobs:
       - name: "🔍 push product-prices-collector-parent docker image to ECR"
         run: |
           region=$(awk -F '"' '{print $2;exit}' < infrastructure/environments/${{ env.ENVIRONMENT }}/env_vars.yaml)
-          echo "Region=${region}"
           
           (cd source/backend/product_prices_collector/parent && \
           ../../../../misc/push_lambda_image.sh ${{ env.AWS_ACCOUNT }} $region ./../../)
@@ -76,7 +75,6 @@ jobs:
       - name: "🔍 push product-prices-collector-child docker image to ECR"
         run: |
           region=$(awk -F '"' '{print $2;exit}' < infrastructure/environments/${{ env.ENVIRONMENT }}/env_vars.yaml)
-          echo "Region=${region}"
 
           (cd source/backend/product_prices_collector/child && \
           ../../../../misc/push_lambda_image.sh ${{ env.AWS_ACCOUNT }} $region ./../../)
@@ -84,7 +82,6 @@ jobs:
       - name: "🔍 push historic-prices-provider docker image to ECR"
         run: |
           region=$(awk -F '"' '{print $2;exit}' < infrastructure/environments/${{ env.ENVIRONMENT }}/env_vars.yaml)
-          echo "Region=${region}"
 
           (cd source/backend/historic_prices_provider && \
           ../../../misc/push_lambda_image.sh ${{ env.AWS_ACCOUNT }} $region ./../)
