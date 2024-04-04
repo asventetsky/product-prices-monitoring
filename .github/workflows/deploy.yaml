@@ -86,7 +86,7 @@ jobs:
           region=$(awk -F '"' '{print $2;exit}' < infrastructure/environments/${{ env.ENVIRONMENT }}/env_vars.yaml)
           echo "Region=${region}"
 
-          (cd source/backend/product_prices_collector/child && \
+          (cd source/backend/historic_prices_provider && \
           ../../../../misc/push_lambda_image.sh ${{ env.AWS_ACCOUNT }} $region ./../)
 
       - name: "🔧 install terraform 1.3.8"
