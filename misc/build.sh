@@ -14,6 +14,7 @@ build_image() {
   docker save "${LAMBDA_NAME_AND_VERSION}" > "${ARTIFACT_FOLDER}/${LAMBDA_NAME_AND_VERSION}".tar
 
   ls -l $ARTIFACT_FOLDER
+  echo "Current folder: $(pwd)"
 }
 
 build() {
