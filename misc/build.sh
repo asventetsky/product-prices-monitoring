@@ -13,7 +13,7 @@ build_image() {
   mkdir -p ${ARTIFACT_FOLDER}
   docker save "${LAMBDA_NAME_AND_VERSION}" > "${ARTIFACT_FOLDER}/${LAMBDA_NAME_AND_VERSION}".tar
 
-  ll $ARTIFACT_FOLDER
+  ls -l $ARTIFACT_FOLDER
 }
 
 build() {
