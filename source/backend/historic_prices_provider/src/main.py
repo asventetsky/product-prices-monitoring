@@ -21,7 +21,8 @@ def handler(event, context):
         product_prices = get_product_price(request["productId"], request["period"])
         combined_product = combine_product_and_prices(product, product_prices)
         return construct_response(combined_product)
-    except Exception:
+    except Exception as error:
+        logging.error("Error on providing historic prices: %s", error)
         return construct_error_response()
 
 
