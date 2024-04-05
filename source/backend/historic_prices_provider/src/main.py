@@ -18,10 +18,19 @@ def handler(event, context):
     try:
         request = _parse_request_query_params(event)
         product = get_product(request["productId"])
+        logging.info(
+            "Product: %s", product
+        )
+
         product_prices = get_product_price(request["productId"], request["period"])
+        logging.info(
+            "Product price: %s", product_prices
+        )
+
         combined_product = combine_product_and_prices(product, product_prices)
         return construct_response(combined_product)
-    except Exception:
+    except Exception as error:
+        logging.error("Error on providing historic prices: %s", error)
         return construct_error_response()
 
 

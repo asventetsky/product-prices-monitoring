@@ -20,21 +20,27 @@ jobs:
         with:
           python-version: '3.12'
 
+      # TODO: refactor path handling (looks awful)
       - name: "🔍 build product-prices-collector-parent docker image"
         run: |
           (cd source/backend/product_prices_collector/parent && \
-          ../../../../misc/build.sh)
+          ../../../../misc/build.sh ./../../)
 
       - name: "🔍 build product-prices-collector-child docker image"
         run: |
           (cd source/backend/product_prices_collector/child && \
-          ../../../../misc/build.sh)
+          ../../../../misc/build.sh ./../../)
 
-      - name: "💾 save product prices collector lambda docker images"
+      - name: "🔍 build historic_prices_provider docker image"
+        run: |
+          (cd source/backend/historic_prices_provider && \
+          ../../../misc/build.sh ./../)
+
+      - name: "💾 save product prices monitoring lambda docker images"
         uses: actions/cache@v4
         with:
-          key: product-prices-collector-artifacts-${{ github.run_number }}
-          path: ./source/backend/product_prices_collector/target
+          key: product-prices-monitoring-artifacts-${{ github.run_number }}
+          path: ./source/backend/target
 
   deploy-dev:
     name: Deploy application to DEV
@@ -51,28 +57,33 @@ jobs:
       - name: "☁️ checkout repository"
         uses: actions/checkout@v4
 
-      - name: "💾 fetch lambdas docker images"
+      - name: "💾 fetch product prices monitoring lambda docker images"
         uses: actions/cache@v4
         with:
-          key: product-prices-collector-artifacts-${{ github.run_number }}
-          path: ./source/backend/product_prices_collector/target
+          key: product-prices-monitoring-artifacts-${{ github.run_number }}
+          path: ./source/backend/target
           fail-on-cache-miss: true
 
       - name: "🔍 push product-prices-collector-parent docker image to ECR"
         run: |
           region=$(awk -F '"' '{print $2;exit}' < infrastructure/environments/${{ env.ENVIRONMENT }}/env_vars.yaml)
-          echo "Region=${region}"
-
+          
           (cd source/backend/product_prices_collector/parent && \
-          ../../../../misc/push_lambda_image.sh ${{ env.AWS_ACCOUNT }} $region)
+          ../../../../misc/push_lambda_image.sh ${{ env.AWS_ACCOUNT }} $region ./../../)
 
       - name: "🔍 push product-prices-collector-child docker image to ECR"
         run: |
           region=$(awk -F '"' '{print $2;exit}' < infrastructure/environments/${{ env.ENVIRONMENT }}/env_vars.yaml)
-          echo "Region=${region}"
 
           (cd source/backend/product_prices_collector/child && \
-          ../../../../misc/push_lambda_image.sh ${{ env.AWS_ACCOUNT }} $region)
+          ../../../../misc/push_lambda_image.sh ${{ env.AWS_ACCOUNT }} $region ./../../)
+
+      - name: "🔍 push historic-prices-provider docker image to ECR"
+        run: |
+          region=$(awk -F '"' '{print $2;exit}' < infrastructure/environments/${{ env.ENVIRONMENT }}/env_vars.yaml)
+
+          (cd source/backend/historic_prices_provider && \
+          ../../../misc/push_lambda_image.sh ${{ env.AWS_ACCOUNT }} $region ./../)
 
       - name: "🔧 install terraform 1.3.8"
         uses: hashicorp/setup-terraform@v3
@@ -91,10 +102,13 @@ jobs:
       - name: "🔍 prepare environment vars"
         run: |
           (cd source/backend/product_prices_collector/parent && \
-          ../../../../misc/prepare_terragrunt_variables.sh ${{ env.AWS_ACCOUNT }} ${{ env.ENVIRONMENT }} placeholder_parent)
+          ../../../../misc/prepare_terragrunt_variables.sh ${{ env.AWS_ACCOUNT }} ${{ env.ENVIRONMENT }} placeholder_parent ./../../)
 
           (cd source/backend/product_prices_collector/child && \
-          ../../../../misc/prepare_terragrunt_variables.sh ${{ env.AWS_ACCOUNT }} ${{ env.ENVIRONMENT }} placeholder_child)
+          ../../../../misc/prepare_terragrunt_variables.sh ${{ env.AWS_ACCOUNT }} ${{ env.ENVIRONMENT }} placeholder_child ./../../)
+          
+          (cd source/backend/historic_prices_provider && \
+          ../../../misc/prepare_terragrunt_variables.sh ${{ env.AWS_ACCOUNT }} ${{ env.ENVIRONMENT }} placeholder_historic_prices ./../)
 
       - name: "🔍 run terragrunt init and terragrunt apply"
         run: |

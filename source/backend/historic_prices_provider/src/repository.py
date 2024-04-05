@@ -9,7 +9,7 @@ import boto3
 client = boto3.client(
     "dynamodb",
     region_name=os.environ["AWS_REGION"],
-    endpoint_url=os.environ["DYNAMODB_ENDPOINT"]
+    endpoint_url=os.environ.get('DYNAMODB_ENDPOINT', f"https://dynamodb.{os.environ['AWS_REGION']}.amazonaws.com")
 )
 PRODUCTS_TABLE_NAME = os.environ["PRODUCTS_TABLE_NAME"]
 PRODUCT_PRICES_TABLE_NAME = os.environ["PRODUCT_PRICES_TABLE_NAME"]
