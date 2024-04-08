@@ -16,7 +16,7 @@ build_zip_archive() {
   cd ..
   zip -r $ARCHIVE_NAME.zip src
 
-  less $ARCHIVE_NAME.zip
+  unzip -l $ARCHIVE_NAME.zip
 
 #  RELATIVE_ARTIFACT_PATH=$1
 #  LAMBDA_NAME_AND_VERSION=$("${RELATIVE_ARTIFACT_PATH}"../../misc/extract_lambda_name_version.sh)
