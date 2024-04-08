@@ -167,7 +167,7 @@ module "api_gateway" {
 # LAMBDA: provide historic prices #
 #=================================#
 
-module "lambda_historic_prices_provider" {
+module "lambda_historic_prices_provider_new" {
   source = "terraform-aws-modules/lambda/aws"
   version = "6.8.0"
 
