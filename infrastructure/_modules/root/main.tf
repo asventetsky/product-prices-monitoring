@@ -172,7 +172,7 @@ module "lambda_historic_prices_provider_new" {
   version = "6.8.0"
 
   function_name = "lambda_historic_prices_provider_new-${var.region}-${var.env}"
-  description   = "Provides list of prices for a particular period"
+  description   = "Provides a list of prices for a particular period"
   handler       = "src/main.handler"
   runtime       = "python3.9"
 
@@ -203,6 +203,12 @@ module "lambda_historic_prices_provider_new" {
     PRODUCTS_TABLE_NAME = module.dynamo_db_products_table.table_name
     PRODUCT_PRICES_TABLE_NAME = module.dynamo_db_historic_product_prices.table_name
   }
+
+  logging_log_group             = "/aws/lambda/lambda_historic_prices_provider_new-${var.region}-${var.env}"
+  logging_log_format            = "JSON"
+  logging_application_log_level = "INFO"
+  logging_system_log_level      = "DEBUG"
+  cloudwatch_logs_retention_in_days = 3
 
   tags = var.resource_tags
 }
