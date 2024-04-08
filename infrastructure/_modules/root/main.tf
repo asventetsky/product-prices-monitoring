@@ -166,43 +166,36 @@ module "api_gateway" {
 #=================================#
 # LAMBDA: provide historic prices #
 #=================================#
-data "aws_iam_policy_document" "historic_prices_provider" {
-  statement {
-    actions   = ["logs:CreateLogStream", "logs:PutLogEvents"]
-    resources = ["arn:aws:logs:*:*:*"]
-    effect = "Allow"
-  }
-  statement {
-    actions   = ["dynamodb:Query"]
-    resources = [
-      module.dynamo_db_products_table.table_arn,
-      "${module.dynamo_db_products_table.table_arn}/index/*",
-      module.dynamo_db_historic_product_prices.table_arn,
-      "${module.dynamo_db_historic_product_prices.table_arn}/index/*",
-    ]
-    effect = "Allow"
-  }
-}
-
-module "lambda_historic_prices_provider_iam_role" {
-  source = "github.com/asventetsky/freecodecamp-aws-serverless-projects-common//terraform/module/aws/lambda_iam_role?ref=1c71f0bcea456cecbedfc8b67cc540144217bb8d"
-
-  region = var.region
-  env = var.env
-  lambda_name = "lambda_historic_prices_provider"
-  policy_json_string = data.aws_iam_policy_document.historic_prices_provider.json
-
-  resource_tags = var.resource_tags
-}
 
 module "lambda_historic_prices_provider" {
-  source = "../../../../../_modules/lambda_docker_image"
+  source = "terraform-aws-modules/lambda/aws"
 
-  name = "lambda_historic_prices_provider"
-  region = var.region
-  env = var.env
-  lambda_role_arn = module.lambda_historic_prices_provider_iam_role.arn
-  image_uri = var.lambda_historic_prices_provider_image_uri
+  function_name = "lambda_historic_prices_provider-${var.region}-${var.env}"
+  description   = "Provides list of prices for a particular period"
+  handler       = "src/main.handler"
+  runtime       = "python3.12"
+
+  create_package         = false
+  local_existing_package = "../../../../../../source/backend/historic_prices_provider/lambda_historic_prices_provider.zip"
+
+  attach_policy_statements = true
+  policy_statements = {
+    dynamodb = {
+      effect    = "Allow",
+      actions   = ["dynamodb:Query"]
+      resources = [
+        module.dynamo_db_products_table.table_arn,
+        "${module.dynamo_db_products_table.table_arn}/index/*",
+        module.dynamo_db_historic_product_prices.table_arn,
+        "${module.dynamo_db_historic_product_prices.table_arn}/index/*",
+      ]
+    },
+    s3_read = {
+      effect    = "Allow",
+      actions   = ["logs:CreateLogStream", "logs:PutLogEvents"]
+      resources = ["arn:aws:logs:*:*:*"]
+    }
+  }
 
   environment_variables = {
     REGION = var.region
@@ -210,5 +203,5 @@ module "lambda_historic_prices_provider" {
     PRODUCT_PRICES_TABLE_NAME = module.dynamo_db_historic_product_prices.table_name
   }
 
-  resource_tags = var.resource_tags
+  tags = var.resource_tags
 }
