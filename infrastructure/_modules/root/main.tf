@@ -157,8 +157,8 @@ module "api_gateway" {
 
   integrations = {
     "GET /product-prices" = {
-      lambda_invoke_arn = module.lambda_historic_prices_provider.lambda_function_invoke_arn
-      lambda_function_name = module.lambda_historic_prices_provider.lambda_function_name
+      lambda_invoke_arn = module.lambda_historic_prices_provider_new.lambda_function_invoke_arn
+      lambda_function_name = module.lambda_historic_prices_provider_new.lambda_function_name
     }
   }
 }
@@ -171,7 +171,7 @@ module "lambda_historic_prices_provider_new" {
   source = "terraform-aws-modules/lambda/aws"
   version = "6.8.0"
 
-  function_name = "lambda_historic_prices_provider-${var.region}-${var.env}"
+  function_name = "lambda_historic_prices_provider_new-${var.region}-${var.env}"
   description   = "Provides list of prices for a particular period"
   handler       = "src/main.handler"
   runtime       = "python3.9"
