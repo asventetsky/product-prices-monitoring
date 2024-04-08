@@ -15,10 +15,6 @@ build_zip_archive() {
 
   cd ..
   zip -r $ARCHIVE_NAME.zip src
-
-  ls -l
-
-#  unzip -l $ARCHIVE_NAME.zip
 }
 
 build() {

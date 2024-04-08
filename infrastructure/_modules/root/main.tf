@@ -174,7 +174,7 @@ module "lambda_historic_prices_provider" {
   function_name = "lambda_historic_prices_provider-${var.region}-${var.env}"
   description   = "Provides list of prices for a particular period"
   handler       = "src/main.handler"
-  runtime       = "python3.12"
+  runtime       = "python3.9"
 
   create_package         = false
   local_existing_package = "../../../../../../source/backend/historic_prices_provider/lambda_historic_prices_provider.zip"
