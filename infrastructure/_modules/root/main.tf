@@ -169,6 +169,7 @@ module "api_gateway" {
 
 module "lambda_historic_prices_provider" {
   source = "terraform-aws-modules/lambda/aws"
+  version = "6.8.0"
 
   function_name = "lambda_historic_prices_provider-${var.region}-${var.env}"
   description   = "Provides list of prices for a particular period"
