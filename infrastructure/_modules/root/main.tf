@@ -177,7 +177,7 @@ module "lambda_historic_prices_provider_new" {
   runtime       = "python3.9"
 
   create_package         = false
-  local_existing_package = "../../../../../../source/backend/historic_prices_provider/lambda_historic_prices_provider.zip"
+  local_existing_package = "../../../../../../source/backend/target/lambda_historic_prices_provider.zip"
 
   attach_policy_statements = true
   policy_statements = {

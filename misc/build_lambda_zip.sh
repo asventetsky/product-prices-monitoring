@@ -17,6 +17,8 @@ build_zip_archive() {
   zip -r $ARCHIVE_NAME.zip src
 
   mv $ARCHIVE_NAME.zip ./../target
+
+  ls -l ./../target
 }
 
 build() {
