@@ -157,8 +157,8 @@ module "api_gateway" {
 
   integrations = {
     "GET /product-prices" = {
-      lambda_invoke_arn = module.lambda_historic_prices_provider.lambda_invoke_arn
-      lambda_function_name = module.lambda_historic_prices_provider.lambda_name
+      lambda_invoke_arn = module.lambda_historic_prices_provider.lambda_function_invoke_arn
+      lambda_function_name = module.lambda_historic_prices_provider.lambda_function_name
     }
   }
 }
