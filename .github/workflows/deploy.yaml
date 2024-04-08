@@ -6,7 +6,6 @@ on:
   push:
     branches:
       - main
-      - feature/deploy-historic-prices-provider-with-zip
 
 jobs:
   build:
@@ -45,7 +44,7 @@ jobs:
 
   deploy-dev:
     name: Deploy application to DEV
-#    if: ${{ github.event_name == 'workflow_dispatch' }}
+    if: ${{ github.event_name == 'workflow_dispatch' }}
     environment: dev
     needs: build
     runs-on: ubuntu-latest
