@@ -202,9 +202,16 @@ module "lambda_historic_prices_provider_new" {
     REGION = var.region
     PRODUCTS_TABLE_NAME = module.dynamo_db_products_table.table_name
     PRODUCT_PRICES_TABLE_NAME = module.dynamo_db_historic_product_prices.table_name
+    S3_BUCKET_CACHE_NAME = aws_s3_bucket.lambda_historic_prices_provider_new_cache.bucket
   }
 
   cloudwatch_logs_retention_in_days = 3
+
+  tags = var.resource_tags
+}
+
+resource "aws_s3_bucket" "lambda_historic_prices_provider_new_cache" {
+  bucket = "lambda_historic_prices_provider_new_cache-${var.region}-${var.env}"
 
   tags = var.resource_tags
 }
