@@ -211,7 +211,7 @@ module "lambda_historic_prices_provider_new" {
 }
 
 resource "aws_s3_bucket" "lambda_historic_prices_provider_new_cache" {
-  bucket = "lambda_historic_prices_provider_new_cache-${var.region}-${var.env}"
+  bucket = "lambda-historic-prices-provider-new-cache-${var.region}-${var.env}"
 
   tags = var.resource_tags
 }
