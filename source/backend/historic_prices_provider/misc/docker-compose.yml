@@ -4,7 +4,7 @@ services:
 
   historic-prices-provider:
     depends_on:
-      dynamodb:
+      localstack:
         condition: service_healthy
     container_name: "historic-prices-provider"
     image: "historic-prices-provider:latest"
@@ -12,7 +12,8 @@ services:
     ports:
       - 9000:8080
     environment:
-      - DYNAMODB_ENDPOINT=http://dynamodb:4566
+      - DYNAMODB_ENDPOINT=http://localstack:4566
+      - S3_ENDPOINT=http://localstack:4566
       - PRODUCTS_TABLE_NAME=products
       - PRODUCT_PRICES_TABLE_NAME=product-prices
       - AWS_REGION=eu-central-1
@@ -21,15 +22,15 @@ services:
     volumes:
       - ./../src:/var/task/src
 
-  dynamodb:
-    container_name: "localstack-dynamodb"
+  localstack:
+    container_name: "localstack"
     image: "localstack/localstack"
     ports:
       - "127.0.0.1:4566:4566"            # LocalStack Gateway
       - "127.0.0.1:4510-4559:4510-4559"  # external services port range
     environment:
       - DEBUG=0
-      - SERVICES=dynamodb
+      - SERVICES=dynamodb,s3
     healthcheck:
       test: [ "CMD", "curl", "-f", "http://localhost:4566" ]
       interval: 5s

@@ -35,7 +35,11 @@ aws dynamodb batch-write-item \
 aws dynamodb batch-write-item \
 --request-items file://product-prices-items.json \
 --endpoint-url http://localhost:4566 \
---region eu-central-1
+--region eu-central-1 && \
+aws s3api create-bucket \
+    --bucket cache-bucket-example \
+    --endpoint-url http://localhost:4566 \
+    --create-bucket-configuration LocationConstraint=eu-central-1
 ```
 
 ```shell

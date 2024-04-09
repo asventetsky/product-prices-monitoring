@@ -191,10 +191,20 @@ module "lambda_historic_prices_provider_new" {
         "${module.dynamo_db_historic_product_prices.table_arn}/index/*",
       ]
     },
-    s3_read = {
+    logs = {
       effect    = "Allow",
       actions   = ["logs:CreateLogStream", "logs:PutLogEvents"]
       resources = ["arn:aws:logs:*:*:*"]
+    }
+    s3_list_objects_in_bucket = {
+      effect    = "Allow",
+      actions   = ["s3:ListBucket"]
+      resources = ["arn:aws:s3:::${aws_s3_bucket.lambda_historic_prices_provider_new_cache.bucket}"]
+    }
+    s3_all_object_actions = {
+      effect    = "Allow",
+      actions   = ["s3:*Object"]
+      resources = ["arn:aws:s3:::${aws_s3_bucket.lambda_historic_prices_provider_new_cache.bucket}/*"]
     }
   }
 
@@ -202,9 +212,16 @@ module "lambda_historic_prices_provider_new" {
     REGION = var.region
     PRODUCTS_TABLE_NAME = module.dynamo_db_products_table.table_name
     PRODUCT_PRICES_TABLE_NAME = module.dynamo_db_historic_product_prices.table_name
+    S3_BUCKET_CACHE_NAME = aws_s3_bucket.lambda_historic_prices_provider_new_cache.bucket
   }
 
   cloudwatch_logs_retention_in_days = 3
+
+  tags = var.resource_tags
+}
+
+resource "aws_s3_bucket" "lambda_historic_prices_provider_new_cache" {
+  bucket = "lambda-historic-prices-provider-new-cache-${var.region}-${var.env}"
 
   tags = var.resource_tags
 }

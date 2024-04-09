@@ -13,7 +13,7 @@ build_zip_archive() {
     #  chmod 755 package
 
     cd package
-    zip -r ../$ARCHIVE_NAME.zip .
+    zip -qr ../$ARCHIVE_NAME.zip .
 
     cd ..
     zip -r $ARCHIVE_NAME.zip src
@@ -22,13 +22,16 @@ build_zip_archive() {
     zip -r $ARCHIVE_NAME.zip src
   fi
 
+#  echo "Listing archive content"
+#  unzip -l $ARCHIVE_NAME.zip
+
   mv $ARCHIVE_NAME.zip ./../target
   ls -l ./../target
 }
 
 build() {
   echo "Running code quality tools"
-  pylint --rcfile="./.pylintrc" src/ test/
+  pylint --rcfile=".pylintrc" src/ test/
 
   echo "Running tests"
   python3 -m unittest
