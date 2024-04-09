@@ -12,9 +12,6 @@ build_zip_archive() {
 
     #  chmod 755 package
 
-    echo "Listing 'package' folder"
-    ls -l package
-
     cd package
     zip -qr ../$ARCHIVE_NAME.zip .
 
@@ -25,8 +22,8 @@ build_zip_archive() {
     zip -r $ARCHIVE_NAME.zip src
   fi
 
-  echo "Listing archive content"
-  unzip -l $ARCHIVE_NAME.zip
+#  echo "Listing archive content"
+#  unzip -l $ARCHIVE_NAME.zip
 
   mv $ARCHIVE_NAME.zip ./../target
   ls -l ./../target
@@ -34,7 +31,7 @@ build_zip_archive() {
 
 build() {
   echo "Running code quality tools"
-#  pylint --rcfile="./.pylintrc" src/ test/
+  pylint --rcfile=".pylintrc" src/ test/
 
   echo "Running tests"
   python3 -m unittest
