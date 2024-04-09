@@ -191,10 +191,20 @@ module "lambda_historic_prices_provider_new" {
         "${module.dynamo_db_historic_product_prices.table_arn}/index/*",
       ]
     },
-    s3_read = {
+    logs = {
       effect    = "Allow",
       actions   = ["logs:CreateLogStream", "logs:PutLogEvents"]
       resources = ["arn:aws:logs:*:*:*"]
+    }
+    s3_list_objects_in_bucket = {
+      effect    = "Allow",
+      actions   = ["s3:ListBucket"]
+      resources = ["arn:aws:s3:::${aws_s3_bucket.lambda_historic_prices_provider_new_cache.bucket}"]
+    }
+    s3_all_object_actions = {
+      effect    = "Allow",
+      actions   = ["s3:*Object"]
+      resources = ["arn:aws:s3:::${aws_s3_bucket.lambda_historic_prices_provider_new_cache.bucket}/*"]
     }
   }
 
