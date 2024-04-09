@@ -15,7 +15,7 @@ logging.getLogger().setLevel(logging.INFO)
 
 s3 = s3fs.S3FileSystem(
     anon=False,
-    endpoint_url=os.environ.get('S3_ENDPOINT', f"https://s3.{os.environ['AWS_REGION']}.amazonaws.com")
+    endpoint_url=os.environ.get('S3_ENDPOINT', f"https://s3.{os.environ['REGION']}.amazonaws.com")
 )
 
 S3_BUCKET_CACHE_NAME = os.environ['S3_BUCKET_CACHE_NAME']
