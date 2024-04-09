@@ -22,6 +22,9 @@ build_zip_archive() {
     zip -r $ARCHIVE_NAME.zip src
   fi
 
+  echo "Listing archive content"
+  unzip -l $ARCHIVE_NAME.zip
+
   mv $ARCHIVE_NAME.zip ./../target
   ls -l ./../target
 }
