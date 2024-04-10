@@ -5,7 +5,7 @@ resource "aws_api_gateway_rest_api" "this" {
 #=======================#
 # Cognito configuration #
 #=======================#
-resource "aws_cognito_user_pool" "this_1" {
+resource "aws_cognito_user_pool" "this" {
   count = var.cognito_auth ? 1 : 0
 
   name = "${aws_api_gateway_rest_api.this.name}-user-pool"
@@ -41,7 +41,7 @@ resource "aws_cognito_user_pool_client" "this" {
     "ALLOW_USER_PASSWORD_AUTH",
     "ALLOW_REFRESH_TOKEN_AUTH"
   ]
-  user_pool_id = aws_cognito_user_pool.this_1[0].id
+  user_pool_id = aws_cognito_user_pool.this[0].id
 }
 
 resource "aws_api_gateway_authorizer" "this" {
@@ -50,14 +50,14 @@ resource "aws_api_gateway_authorizer" "this" {
   name          = "${aws_api_gateway_rest_api.this.name}-user-pool-authorizer"
   type          = "COGNITO_USER_POOLS"
   rest_api_id   = aws_api_gateway_rest_api.this.id
-  provider_arns = [aws_cognito_user_pool.this_1[0].arn]
+  provider_arns = [aws_cognito_user_pool.this[0].arn]
 }
 
 resource "aws_cognito_user_pool_domain" "main" {
   count = var.cognito_auth ? 1 : 0
 
   domain       = "${aws_api_gateway_rest_api.this.name}-user-pool-domain"
-  user_pool_id = aws_cognito_user_pool.this_1[0].id
+  user_pool_id = aws_cognito_user_pool.this[0].id
 }
 
 resource "aws_api_gateway_deployment" "this" {
