@@ -26,6 +26,7 @@ resource "aws_cognito_user_pool" "this" {
   }
 
   verification_message_template {
+    default_email_option = "CONFIRM_WITH_LINK" # CONFIRM_WITH_CODE
     email_subject_by_link = "Email Address Verification Request for ${var.api_gateway_name}"
     email_message_by_link = "We have received a request to authorize this email address for use with ${var.api_gateway_name}. If you requested this verification, please go to the following URL to confirm that you are authorized to use this email address:\n{##Click Here##}"
   }

@@ -45,14 +45,14 @@ aws lambda invoke --function-name lambda_prices_collector-<aws_region>-<environm
 ```bash
 aws cognito-idp list-user-pools \
   --max-results 1 \
-  --query "UserPools[?starts_with(Name, 'combination-api-app')].Id | [0]"
+  --query "UserPools[?starts_with(Name, 'product-pricess-monitoring')].Id | [0]"
 ```
 
 ### Fetch user_pool_client_id
 ```bash
 aws cognito-idp list-user-pool-clients \
   --user-pool-id [user_pool_id] \
-  --query "UserPoolClients[?starts_with(ClientName, 'combination-api-app')].ClientId | [0]"
+  --query "UserPoolClients[?starts_with(ClientName, 'product-pricess-monitoring)].ClientId | [0]"
 ```
 
 ### Create Cognito user
