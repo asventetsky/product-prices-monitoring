@@ -53,6 +53,13 @@ resource "aws_api_gateway_authorizer" "this" {
   provider_arns = [aws_cognito_user_pool.this_1[0].arn]
 }
 
+resource "aws_cognito_user_pool_domain" "main" {
+  count = var.cognito_auth ? 1 : 0
+
+  domain       = "${aws_api_gateway_rest_api.this.name}-user-pool-domain"
+  user_pool_id = aws_cognito_user_pool.this_1.id
+}
+
 resource "aws_api_gateway_deployment" "this" {
   depends_on = [aws_api_gateway_integration.this]
 
