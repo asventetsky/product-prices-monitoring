@@ -14,9 +14,10 @@ services:
     environment:
       - DYNAMODB_ENDPOINT=http://localstack:4566
       - S3_ENDPOINT=http://localstack:4566
+      - S3_BUCKET_CACHE_NAME=historic-prices-provider-cache-bucket
       - PRODUCTS_TABLE_NAME=products
       - PRODUCT_PRICES_TABLE_NAME=product-prices
-      - AWS_REGION=eu-central-1
+      - REGION=eu-central-1
       - AWS_ACCESS_KEY_ID=accesskeyid
       - AWS_SECRET_ACCESS_KEY=secretaccesskey
     volumes:
@@ -31,6 +32,10 @@ services:
     environment:
       - DEBUG=0
       - SERVICES=dynamodb,s3
+    volumes:
+      - "./localstack/init-aws.sh:/etc/localstack/init/ready.d/init-aws.sh"                     # ready hook
+      - "./localstack/product-prices-items.json:/opt/code/localstack/product-prices-items.json" # populate product-prices DynamoDB table
+      - "./localstack/products-items.json:/opt/code/localstack/products-items.json"             # populate products DynamoDB table
     healthcheck:
       test: [ "CMD", "curl", "-f", "http://localhost:4566" ]
       interval: 5s
