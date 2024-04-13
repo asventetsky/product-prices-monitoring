@@ -152,7 +152,7 @@ module "api_gateway" {
   source = "../../../../../_modules/api_gateway"
 
   api_gateway_name = "product-pricess-monitoring-app-${var.region}-${var.env}"
-  cognito_auth = false
+  cognito_auth = true
   stage = var.env
 
   integrations = {
