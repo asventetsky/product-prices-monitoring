@@ -61,7 +61,7 @@ resource "aws_cognito_user_pool_domain" "main" {
 }
 
 resource "aws_api_gateway_deployment" "this" {
-  depends_on = [aws_api_gateway_integration.root]
+  depends_on = [aws_api_gateway_integration.root, aws_api_gateway_integration.child]
 
   stage_description = md5(file("main.tf"))
   rest_api_id = aws_api_gateway_rest_api.this.id
