@@ -151,23 +151,12 @@ module "lambda_product_prices_collector_child" {
 module "api_gateway" {
   source = "../../../../../_modules/api_gateway"
 
-  api_gateway_name = "product-pricess-monitoring-app-${var.region}-${var.env}"
+  api_gateway_name = "product-prices-monitoring-app-${var.region}-${var.env}"
   cognito_auth = true
   stage = var.env
 
-  integrations = {
-    "GET /products" = {
-      nested_path = false
-      lambda_invoke_arn = module.lambda_historic_prices_provider_new.lambda_function_invoke_arn
-      lambda_function_name = module.lambda_historic_prices_provider_new.lambda_function_name
-    }
-
-    "GET /products/{id}" = {
-      nested_path = true
-      lambda_invoke_arn = module.lambda_historic_prices_provider_new.lambda_function_invoke_arn
-      lambda_function_name = module.lambda_historic_prices_provider_new.lambda_function_name
-    }
-  }
+  lambda_invoke_arn = module.lambda_historic_prices_provider_new.lambda_function_invoke_arn
+  lambda_function_name = module.lambda_historic_prices_provider_new.lambda_function_name
 }
 
 #=================================#

@@ -1,7 +1,3 @@
-locals {
-  integrations_list = [for k, r in var.integrations : k]
-}
-
 resource "aws_api_gateway_rest_api" "this" {
   name = var.api_gateway_name
 }
@@ -65,7 +61,7 @@ resource "aws_cognito_user_pool_domain" "main" {
 }
 
 resource "aws_api_gateway_deployment" "this" {
-  depends_on = [aws_api_gateway_integration.this]
+  depends_on = [aws_api_gateway_integration.root]
 
   stage_description = md5(file("main.tf"))
   rest_api_id = aws_api_gateway_rest_api.this.id
@@ -84,51 +80,68 @@ resource "aws_api_gateway_stage" "this" {
 #=============================================#
 # Declare resources, methods and integrations #
 #=============================================#
-resource "aws_api_gateway_resource" "this" {
-  for_each = var.integrations
-
-  path_part = split("/", split(" ", each.key)[1])[1]
+resource "aws_api_gateway_resource" "root" {
+  path_part = "products"
   parent_id = aws_api_gateway_rest_api.this.root_resource_id
   rest_api_id = aws_api_gateway_rest_api.this.id
 }
 
-resource "aws_api_gateway_resource" "this_nested" {
-  for_each = { for k, v in var.integrations : k => v if v.nested_path }
-
-  path_part = split("/", split(" ", each.key)[1])[2]
-  parent_id = aws_api_gateway_resource.this[each.key].id
+resource "aws_api_gateway_resource" "child" {
+  path_part = "{id}"
+  parent_id = aws_api_gateway_resource.root.id
   rest_api_id = aws_api_gateway_rest_api.this.id
 }
 
-resource "aws_api_gateway_method" "this" {
-  for_each = var.integrations
-
+resource "aws_api_gateway_method" "root" {
   rest_api_id = aws_api_gateway_rest_api.this.id
-  resource_id = aws_api_gateway_resource.this[each.key].id
-  http_method = split(" ", each.key)[0]
+  resource_id = aws_api_gateway_resource.root.id
+  http_method = "GET"
 
   authorization = var.cognito_auth ? "COGNITO_USER_POOLS" : "NONE"
   authorizer_id = var.cognito_auth ? aws_api_gateway_authorizer.this[0].id : null
 }
 
-resource "aws_lambda_permission" "this" {
-  for_each = var.integrations
+resource "aws_api_gateway_method" "child" {
+  rest_api_id = aws_api_gateway_rest_api.this.id
+  resource_id = aws_api_gateway_resource.child.id
+  http_method = "GET"
 
+  authorization = var.cognito_auth ? "COGNITO_USER_POOLS" : "NONE"
+  authorizer_id = var.cognito_auth ? aws_api_gateway_authorizer.this[0].id : null
+
+  request_parameters = {
+    "method.request.path.id" = true
+  }
+}
+
+resource "aws_lambda_permission" "this" {
   action        = "lambda:InvokeFunction"
-  function_name = each.value.lambda_function_name
+  function_name = var.lambda_function_name
   principal     = "apigateway.amazonaws.com"
 
   source_arn = "${aws_api_gateway_rest_api.this.execution_arn}/*/*"
 }
 
-resource "aws_api_gateway_integration" "this" {
-  for_each = var.integrations
-
+resource "aws_api_gateway_integration" "root" {
   rest_api_id = aws_api_gateway_rest_api.this.id
-  resource_id = aws_api_gateway_resource.this[each.key].id
-  http_method = aws_api_gateway_method.this[each.key].http_method
+  resource_id = aws_api_gateway_resource.root.id
+  http_method = aws_api_gateway_method.root.http_method
 
   integration_http_method = "POST"
   type = "AWS_PROXY"
-  uri = each.value.lambda_invoke_arn
+  uri = var.lambda_invoke_arn
+}
+
+resource "aws_api_gateway_integration" "child" {
+  rest_api_id = aws_api_gateway_rest_api.this.id
+  resource_id = aws_api_gateway_resource.child.id
+  http_method = aws_api_gateway_method.child.http_method
+
+  integration_http_method = "POST"
+  type = "AWS_PROXY"
+  uri = var.lambda_invoke_arn
+
+  request_parameters = {
+    "method.request.path.id" = true
+  }
 }
