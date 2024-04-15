@@ -83,8 +83,16 @@ resource "aws_api_gateway_stage" "this" {
 resource "aws_api_gateway_resource" "this" {
   for_each = var.integrations
 
-  path_part = replace(split(" ", each.key)[1], "/", "")
+  path_part = split("/", split(" ", each.key)[1])[1]
   parent_id = aws_api_gateway_rest_api.this.root_resource_id
+  rest_api_id = aws_api_gateway_rest_api.this.id
+}
+
+resource "aws_api_gateway_resource" "this_nested" {
+  for_each = { for k, v in var.integrations : k => v if v.nested_path }
+
+  path_part = split("/", split(" ", each.key)[1])[2]
+  parent_id = aws_api_gateway_resource.this[index(var.integrations, each)].id
   rest_api_id = aws_api_gateway_rest_api.this.id
 }
 

@@ -156,7 +156,14 @@ module "api_gateway" {
   stage = var.env
 
   integrations = {
-    "GET /product-prices" = {
+    "GET /products" = {
+      nested_path = false
+      lambda_invoke_arn = module.lambda_historic_prices_provider_new.lambda_function_invoke_arn
+      lambda_function_name = module.lambda_historic_prices_provider_new.lambda_function_name
+    }
+
+    "GET /products/{id}" = {
+      nested_path = true
       lambda_invoke_arn = module.lambda_historic_prices_provider_new.lambda_function_invoke_arn
       lambda_function_name = module.lambda_historic_prices_provider_new.lambda_function_name
     }

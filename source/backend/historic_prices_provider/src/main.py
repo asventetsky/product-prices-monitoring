@@ -24,6 +24,8 @@ S3_BUCKET_CACHE_NAME = os.environ['S3_BUCKET_CACHE_NAME']
 def handler(event, context):
     """Contains main logic for providing historic prices for a particular product"""
 
+    logging.info("Incoming even: %s", event)
+
     # TODO: extract service layer that handles cache and repository calls
     try:
         request = _parse_request_query_params(event)
