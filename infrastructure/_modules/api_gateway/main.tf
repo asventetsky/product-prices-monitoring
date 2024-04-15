@@ -142,6 +142,6 @@ resource "aws_api_gateway_integration" "child" {
   uri = var.lambda_invoke_arn
 
   request_parameters = {
-    "method.request.path.id" = true
+    "integration.request.path.id" = "method.request.path.id"
   }
 }
