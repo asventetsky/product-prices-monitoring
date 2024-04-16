@@ -29,15 +29,16 @@ def handler(event, context):
         request = _parse_request(event)
 
         if request["pathParameters"]:
-            handle_get_product_prices(request)
+            return handle_get_product_prices(request)
         else:
-            handle_get_products()
+            return handle_get_products()
     except Exception as error:
         logging.error("Error on providing historic prices: %s", error)
         return construct_error_response()
 
 
 def handle_get_products():
+    logging.info("Getting products")
     products = get_products()
     products = [{"id": product['id']['N'], "name": product['name']['S']} for product in products ]
     return construct_response(products)
@@ -45,6 +46,7 @@ def handle_get_products():
 
 def handle_get_product_prices(request):
     product_id = request["pathParameters"]["id"]
+    logging.info("Getting prices for product %s", product_id)
     combined_product = get_from_cache(product_id, request["period"])
     if combined_product is None:
         product = get_product(product_id)
@@ -60,16 +62,17 @@ def handle_get_product_prices(request):
 
 def _parse_request(event):
     try:
-        query_parameters = event["queryStringParameters"]
-        return {
-            "resource": event["resource"],
-            "pathParameters": event["pathParameters"],
-            "productId": query_parameters["productId"],
-            "period": {
-                "from": query_parameters["from"],
-                "to": query_parameters["to"],
-            },
+
+        result = {
+            "pathParameters": event["pathParameters"]
         }
+        query_parameters = event["queryStringParameters"]
+        if query_parameters:
+            result["period"] = {
+                "from": query_parameters["from"],
+                "to": query_parameters["to"]
+            }
+        return result
     except KeyError as error:
         logging.error(
             "Error on parsing request: %s. Original message: %s", error, event
