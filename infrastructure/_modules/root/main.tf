@@ -179,7 +179,7 @@ module "lambda_historic_prices_provider_new" {
   policy_statements = {
     dynamodb = {
       effect    = "Allow",
-      actions   = ["dynamodb:Query"]
+      actions   = ["dynamodb:Query", "dynamodb:Scan"]
       resources = [
         module.dynamo_db_products_table.table_arn,
         "${module.dynamo_db_products_table.table_arn}/index/*",
