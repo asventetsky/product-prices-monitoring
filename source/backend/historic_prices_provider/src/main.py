@@ -8,7 +8,7 @@ import json
 import s3fs
 import os
 
-from src.repository import get_product, get_product_price
+from src.repository import get_products, get_product, get_product_price
 
 
 logging.getLogger().setLevel(logging.INFO)
@@ -24,33 +24,46 @@ S3_BUCKET_CACHE_NAME = os.environ['S3_BUCKET_CACHE_NAME']
 def handler(event, context):
     """Contains main logic for providing historic prices for a particular product"""
 
-    logging.info("Incoming even: %s", event)
-
     # TODO: extract service layer that handles cache and repository calls
     try:
-        request = _parse_request_query_params(event)
+        request = _parse_request(event)
 
-        combined_product = get_from_cache(request["productId"], request["period"])
-        if combined_product is None:
-            product = get_product(request["productId"])
-            logging.info("Product: %s", product)
-
-            product_prices = get_product_price(request["productId"], request["period"])
-            logging.info("Product price: %s", product_prices)
-
-            combined_product = combine_product_and_prices(product, product_prices)
-            save_in_cache(request["productId"], request["period"], combined_product)
-
-        return construct_response(combined_product)
+        if request["pathParameters"]:
+            handle_get_product_prices(request)
+        else:
+            handle_get_products()
     except Exception as error:
         logging.error("Error on providing historic prices: %s", error)
         return construct_error_response()
 
 
-def _parse_request_query_params(event):
+def handle_get_products():
+    products = get_products()
+    products = [{"id": product['id']['N'], "name": product['name']['S']} for product in products ]
+    return construct_response(products)
+
+
+def handle_get_product_prices(request):
+    product_id = request["pathParameters"]["id"]
+    combined_product = get_from_cache(product_id, request["period"])
+    if combined_product is None:
+        product = get_product(product_id)
+        logging.info("Product: %s", product)
+
+        product_prices = get_product_price(product_id, request["period"])
+        logging.info("Product price: %s", product_prices)
+
+        combined_product = combine_product_and_prices(product, product_prices)
+        save_in_cache(product_id, request["period"], combined_product)
+
+    return construct_response(combined_product)
+
+def _parse_request(event):
     try:
         query_parameters = event["queryStringParameters"]
         return {
+            "resource": event["resource"],
+            "pathParameters": event["pathParameters"],
             "productId": query_parameters["productId"],
             "period": {
                 "from": query_parameters["from"],
@@ -81,18 +94,20 @@ def save_in_cache(product_id, period, data):
 
 def combine_product_and_prices(product, product_prices):
     return {
-        'name': product['Items'][0]['name']['S'],
-        'prices': [{pp['date']['S']: pp['shownPrice']['N']} for pp in product_prices['Items']]
+        'product': {
+            'name': product['Items'][0]['name']['S'],
+            'prices': [{pp['date']['S']: pp['shownPrice']['N']} for pp in product_prices['Items']]
+        }
     }
 
-def construct_response(combined_product):
+def construct_response(result):
     """Constructs final response"""
 
     response = {"headers": {"Content-Type": "application/json"}}
 
-    if combined_product:
+    if result:
         response["statusCode"] = 200
-        response["body"] = json.dumps({"product": combined_product})
+        response["body"] = json.dumps(result)
     else:
         response["statusCode"] = 500
         response["body"] = json.dumps({"error": "Internal server error"})
