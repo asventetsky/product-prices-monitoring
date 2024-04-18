@@ -40,7 +40,8 @@ def handler(event, context):
 def handle_get_products():
     logging.info("Getting products")
     products = get_products()
-    products = [{"id": product['id']['N'], "name": product['name']['S']} for product in products ]
+    logging.info("Products from database %s", products)
+    products = [{"id": product['id']['N'], "name": product['name']['S']} for product in products['Items'] ]
     return construct_response(products)
 
 
