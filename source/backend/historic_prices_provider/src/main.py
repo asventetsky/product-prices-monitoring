@@ -62,7 +62,6 @@ def handle_get_product_prices(request):
 
 def _parse_request(event):
     try:
-
         result = {
             "pathParameters": event["pathParameters"]
         }
