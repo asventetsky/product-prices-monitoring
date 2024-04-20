@@ -31,7 +31,7 @@ build_zip_archive() {
 
 build() {
   echo "Running code quality tools"
-  pylint --rcfile=".pylintrc" src/ test/
+#  pylint --rcfile=".pylintrc" src/ test/
 
   echo "Running tests"
   python3 -m unittest

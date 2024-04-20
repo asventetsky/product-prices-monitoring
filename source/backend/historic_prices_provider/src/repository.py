@@ -16,6 +16,13 @@ PRODUCT_PRICES_TABLE_NAME = os.environ["PRODUCT_PRICES_TABLE_NAME"]
 
 logging.getLogger().setLevel(logging.INFO)
 
+
+def get_products():
+    try:
+        return client.scan(TableName=PRODUCTS_TABLE_NAME)
+    except botocore.exceptions.ClientError as error:
+        logging.error("Unable to get products: %s", error)
+
 def get_product(product_id):
     logging.info(
         "product_id: %s", product_id
