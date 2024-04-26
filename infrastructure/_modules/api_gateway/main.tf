@@ -228,6 +228,6 @@ resource "aws_api_gateway_integration_response" "cors" {
   response_parameters = {
     "method.response.header.Access-Control-Allow-Origin" = "'*'", # replace with hostname of frontend (CloudFront)
     "method.response.header.Access-Control-Allow-Headers" = "'Content-Type'",
-    "method.response.header.Access-Control-Allow-Methods" = "'GET, POST'" # remove or add HTTP methods as needed
+    "method.response.header.Access-Control-Allow-Methods" = "'GET, OPTIONS'" # remove or add HTTP methods as needed
   }
 }
