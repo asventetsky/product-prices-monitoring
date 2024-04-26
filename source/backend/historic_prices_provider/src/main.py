@@ -53,6 +53,9 @@ def handle_get_product_prices(request):
         product = get_product(product_id)
         logging.info("Product: %s", product)
 
+        if not product['Items']:
+            raise RuntimeError('Failed to get product: missing product')
+
         product_prices = get_product_price(product_id, request["period"])
         logging.info("Product price: %s", product_prices)
 
@@ -125,7 +128,9 @@ def construct_error_response():
     return {
         "statusCode": 500,
         "headers": {
-            "Content-Type": "application/json"
+            "Content-Type": "application/json",
+            "Access-Control-Allow-Origin": "*",
+            "Access-Control-Allow-Headers": "Content-Type"
         },
         "body": json.dumps({"error": "Internal server error"}),
     }
