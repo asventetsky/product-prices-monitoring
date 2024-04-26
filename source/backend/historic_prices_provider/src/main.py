@@ -109,7 +109,13 @@ def combine_product_and_prices(product, product_prices):
 def construct_response(result):
     """Constructs final response"""
 
-    response = {"headers": {"Content-Type": "application/json"}}
+    response = {
+        "headers": {
+            "Content-Type": "application/json",
+            "Access-Control-Allow-Origin": "*",
+            "Access-Control-Allow-Headers": "Content-Type"
+        }
+    }
 
     if result:
         response["statusCode"] = 200
