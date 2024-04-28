@@ -102,7 +102,13 @@ def combine_product_and_prices(product, product_prices):
     return {
         'product': {
             'name': product['Items'][0]['name']['S'],
-            'prices': [{pp['date']['S']: pp['shownPrice']['N']} for pp in product_prices['Items']]
+            'prices': [
+                {
+                    'date': pp['date']['S'],
+                    'price': pp['shownPrice']['N']
+                }
+                for pp in product_prices['Items']
+            ]
         }
     }
 
