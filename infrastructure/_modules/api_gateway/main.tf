@@ -78,19 +78,20 @@ resource "aws_api_gateway_deployment" "this" {
     #       calculate a hash against whole resources. Be aware that using whole
     #       resources will show a difference after the initial implementation.
     #       It will stabilize to only change when resources change afterwards.
-    redeployment = sha1(jsonencode([
-      aws_api_gateway_resource.root.id,
-      aws_api_gateway_method.root.id,
-      aws_api_gateway_integration.root.id,
-
-      aws_api_gateway_resource.child.id,
-      aws_api_gateway_method.child.id,
-      aws_api_gateway_integration.child.id,
-
-      aws_api_gateway_resource.cors.id,
-      aws_api_gateway_method.cors.id,
-      aws_api_gateway_integration.cors.id,
-    ]))
+#    redeployment = sha1(jsonencode([
+#      aws_api_gateway_resource.root.id,
+#      aws_api_gateway_method.root.id,
+#      aws_api_gateway_integration.root.id,
+#
+#      aws_api_gateway_resource.child.id,
+#      aws_api_gateway_method.child.id,
+#      aws_api_gateway_integration.child.id,
+#
+#      aws_api_gateway_resource.cors.id,
+#      aws_api_gateway_method.cors.id,
+#      aws_api_gateway_integration.cors.id,
+#    ]))
+    redeployment = filesha1("main.tf")
   }
 
   lifecycle {
