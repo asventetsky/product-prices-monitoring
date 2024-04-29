@@ -2,11 +2,10 @@ name: Product prices monitoring DEPLOY
 
 on:
   workflow_dispatch:
-#  pull_request:
+  pull_request:
   push:
     branches:
       - main
-      - feature/historic-prices-cors
 
 jobs:
   build:
@@ -45,7 +44,7 @@ jobs:
 
   deploy-dev:
     name: Deploy application to DEV
-#    if: ${{ github.event_name == 'workflow_dispatch' }}
+    if: ${{ github.event_name == 'workflow_dispatch' }}
     environment: dev
     needs: build
     runs-on: ubuntu-latest
