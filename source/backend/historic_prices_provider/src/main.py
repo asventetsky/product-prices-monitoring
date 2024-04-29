@@ -53,6 +53,9 @@ def handle_get_product_prices(request):
         product = get_product(product_id)
         logging.info("Product: %s", product)
 
+        if not product['Items']:
+            raise RuntimeError('Failed to get product: missing product')
+
         product_prices = get_product_price(product_id, request["period"])
         logging.info("Product price: %s", product_prices)
 
@@ -99,14 +102,26 @@ def combine_product_and_prices(product, product_prices):
     return {
         'product': {
             'name': product['Items'][0]['name']['S'],
-            'prices': [{pp['date']['S']: pp['shownPrice']['N']} for pp in product_prices['Items']]
+            'prices': [
+                {
+                    'date': pp['date']['S'],
+                    'price': pp['shownPrice']['N']
+                }
+                for pp in product_prices['Items']
+            ]
         }
     }
 
 def construct_response(result):
     """Constructs final response"""
 
-    response = {"headers": {"Content-Type": "application/json"}}
+    response = {
+        "headers": {
+            "Content-Type": "application/json",
+            "Access-Control-Allow-Origin": "*",
+            "Access-Control-Allow-Headers": "Content-Type"
+        }
+    }
 
     if result:
         response["statusCode"] = 200
@@ -125,7 +140,9 @@ def construct_error_response():
     return {
         "statusCode": 500,
         "headers": {
-            "Content-Type": "application/json"
+            "Content-Type": "application/json",
+            "Access-Control-Allow-Origin": "*",
+            "Access-Control-Allow-Headers": "Content-Type"
         },
         "body": json.dumps({"error": "Internal server error"}),
     }
