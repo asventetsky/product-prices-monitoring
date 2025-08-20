@@ -25,8 +25,9 @@ build_zip_archive() {
 #  echo "Listing archive content"
 #  unzip -l $ARCHIVE_NAME.zip
 
-  mv $ARCHIVE_NAME.zip ./../target
-  ls -l ./../target
+  mkdir -p target
+  mv $ARCHIVE_NAME.zip ./target/
+  ls -l ./target
 }
 
 build() {

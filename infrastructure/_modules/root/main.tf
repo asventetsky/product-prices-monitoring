@@ -128,13 +128,33 @@ module "lambda_prices_collector_iam_role" {
 }
 
 module "lambda_product_prices_collector_child" {
-  source = "../../../../../_modules/lambda_docker_image"
+  source = "terraform-aws-modules/lambda/aws"
+  version = "6.8.0"
 
-  name = "lambda_product_prices_collector_child"
-  region = var.region
-  env = var.env
-  lambda_role_arn = module.lambda_prices_collector_iam_role.arn
-  image_uri = var.lambda_product_prices_collector_child_image_uri
+  function_name = "lambda_product_prices_collector_child-${var.region}-${var.env}"
+  description   = "Processes individual product price collection tasks from SNS"
+  handler       = "src/main.handler"
+  runtime       = "python3.12"
+
+  create_package         = false
+  local_existing_package = "../../../../../../source/backend/target/lambda_product_prices_collector_child.zip"
+
+  attach_policy_statements = true
+  policy_statements = {
+    dynamodb = {
+      effect    = "Allow",
+      actions   = ["dynamodb:PutItem"]
+      resources = [
+        module.dynamo_db_products_table.table_arn,
+        module.dynamo_db_historic_product_prices.table_arn
+      ]
+    },
+    logs = {
+      effect    = "Allow",
+      actions   = ["logs:CreateLogStream", "logs:PutLogEvents"]
+      resources = ["arn:aws:logs:*:*:*"]
+    }
+  }
 
   environment_variables = {
     REGION = var.region
@@ -142,7 +162,9 @@ module "lambda_product_prices_collector_child" {
     PRODUCT_PRICES_TABLE_NAME = module.dynamo_db_historic_product_prices.table_name
   }
 
-  resource_tags = var.resource_tags
+  cloudwatch_logs_retention_in_days = 3
+
+  tags = var.resource_tags
 }
 
 #==================================================#
