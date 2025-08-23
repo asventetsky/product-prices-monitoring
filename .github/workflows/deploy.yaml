@@ -41,6 +41,7 @@ jobs:
         with:
           key: product-prices-monitoring-artifacts-${{ github.run_number }}
           path: |
+            ./source/backend/product_prices_collector/parent/target
             ./source/backend/product_prices_collector/child/target
             ./source/backend/historic_prices_provider/target
 
@@ -64,6 +65,7 @@ jobs:
         with:
           key: product-prices-monitoring-artifacts-${{ github.run_number }}
           path: |
+            ./source/backend/product_prices_collector/parent/target
             ./source/backend/product_prices_collector/child/target
             ./source/backend/historic_prices_provider/target
           fail-on-cache-miss: true
