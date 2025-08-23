@@ -33,7 +33,7 @@ locals {
 remote_state {
   backend = "s3"
   config = {
-    bucket = "${local.app_name}-tf-state-${local.region}"
+    bucket = "${local.app_name}-upd-tf-state-${local.region}"
     region = "${local.region}"
     key    = "${local.app_name}/terraform.tfstate"
     encrypt = true
