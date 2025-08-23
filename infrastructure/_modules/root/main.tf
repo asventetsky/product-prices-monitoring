@@ -5,8 +5,8 @@ module "sns_product_prices" {
   source = "../../../../../_modules/sns"
 
   name = "product-prices-${var.region}-${var.env}-topic"
-  lambda_name = module.lambda_product_prices_collector_child.lambda_name
-  lambda_arn = module.lambda_product_prices_collector_child.lambda_arn
+  lambda_name = module.lambda_product_prices_collector_child.lambda_function_name
+  lambda_arn = module.lambda_product_prices_collector_child.lambda_function_arn
 
   resource_tags = var.resource_tags
 }
