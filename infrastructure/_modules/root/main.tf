@@ -134,7 +134,7 @@ module "lambda_product_prices_collector_child" {
   function_name = "lambda_product_prices_collector_child-${var.region}-${var.env}"
   description   = "Processes individual product price collection tasks from SNS"
   handler       = "src/main.handler"
-  runtime       = "python3.12"
+  runtime       = "python3.9"
 
   create_package         = false
   local_existing_package = "../../../../../../source/backend/product_prices_collector/child/target/lambda_product_prices_collector_child.zip"
