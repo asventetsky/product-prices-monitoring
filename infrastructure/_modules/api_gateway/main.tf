@@ -61,7 +61,7 @@ resource "aws_api_gateway_authorizer" "this" {
 resource "aws_cognito_user_pool_domain" "main" {
   count = var.cognito_auth ? 1 : 0
 
-  domain       = "${aws_api_gateway_rest_api.this.name}-user-pool-domain"
+  domain       = "${aws_api_gateway_rest_api.this.name}-upd-user-pool-domain"
   user_pool_id = aws_cognito_user_pool.this[0].id
 }
 
